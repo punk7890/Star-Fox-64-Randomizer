@@ -4,13 +4,15 @@ A Star Fox 64 randomizer with a variety of options. Hardware compatible.
 This is currently in beta. Expect bugs. Please report any you may find.
 # Setting Up:
 
-1. Expansion pack (or 8MB set on emulators).
+1. Grab the latest beta: https://github.com/punk7890/Star-Fox-64-Randomizer/releases
 
-2. An US 1.0 version of the game. NOTE: The game dump *needs* to be in Big Endian byte order or patching the ROM cannot be done (you'll get an error in the ROM extracting tool).
+2. Expansion pack (or 8MB set on emulators).
 
-3. xdeltaUI https://www.romhacking.net/utilities/598/
+3. An US 1.0 version of the game. NOTE: The game dump *needs* to be in Big Endian byte order or patching the ROM cannot be done (you'll get an error in the ROM extracting tool).
 
-4. xdaniel's SF64toolkit https://github.com/xdanieldzd/ozmav/tree/master/sf64toolkit (or precompiled: https://drive.google.com/file/d/1Sz1Z5G3CKK7WAetVAo0GxX92_nNQn0sN/view?usp=sharing )
+4. xdeltaUI https://www.romhacking.net/utilities/598/
+
+5. xdaniel's SF64toolkit https://github.com/xdanieldzd/ozmav/tree/master/sf64toolkit (or precompiled: https://drive.google.com/file/d/1Sz1Z5G3CKK7WAetVAo0GxX92_nNQn0sN/view?usp=sharing )
 
 
 
