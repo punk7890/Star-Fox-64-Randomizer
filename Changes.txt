@@ -1,0 +1,59 @@
+Beta 21:
+Custom menu font is now bigger and should appear better on console.
+
+Beta 20:
+Fixed retrying in the map screen. This would cause the last planet to randomize when it shouldn't.
+
+Beta 19:
+Bug fix.
+Added One Hit Kill mode.
+
+Beta 18:
+Added Rainbow Bombs.
+Fixed Allow Same Planets when off (hopefully).
+
+Beta 17:
+Implaneted a randomizer menu. Press L at the main menu to open.
+
+Beta 16:
+Implaneted random music.
+Implaneted random ambient map colors.
+
+Beta 15:
+Fixed a crash.
+Implaneted Marathon Mode.
+
+Beta 14:
+Implaneted skip stright into planets from map select screen.
+
+Beta 13:
+Implanted random item drops.
+
+Beta 12:
+Implanted random engine colors.
+
+Beta 11:
+No same planet order implanted (automatically disabled for now).
+Unlock all medals and expert mode (automatically enabled for now).
+Random chance at starting in a warp space implanted (Sector X, Meteo only. Automatically enabled for testing).
+Random chance at starting in expert mode implanted (automatically enabled for now).
+
+Beta 10:
+Fixed a crash.
+
+Beta 9:
+Fixed correct planet orders taken in map selection screen.
+
+Beta 8:
+Added correct planets taken in map selection screen.
+
+Beta 7:
+Re-coded ASM.
+Improved planet RNG.
+
+Beta 6:
+Initial expansion pack test. Same features as Beta 5.
+
+Beta 5: 
+Fixed retry on the map screen.
+Randomizer now continues after completing the game once.
