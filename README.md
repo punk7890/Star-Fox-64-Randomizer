@@ -1,5 +1,5 @@
 # Star-Fox-64-Randomizer
-A Star Fox 64 randomizer with a variety of options. Hardware compatible.
+A Star Fox 64 randomizer with a variety of options. Coded entirely in ASM and is hardware compatible.
 # Beta Version Notice
 This is currently in beta. Expect bugs. Please report any you may find.
 # Setting Up:
@@ -13,7 +13,6 @@ This is currently in beta. Expect bugs. Please report any you may find.
 4. xdeltaUI https://www.romhacking.net/utilities/598/
 
 5. xdaniel's SF64toolkit https://github.com/xdanieldzd/ozmav/tree/master/sf64toolkit (or precompiled: https://drive.google.com/file/d/1Sz1Z5G3CKK7WAetVAo0GxX92_nNQn0sN/view?usp=sharing )
-
 
 
 # Patching:
