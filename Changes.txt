@@ -1,3 +1,11 @@
+Beta 22:
+Fixed hangs at the main menu / randomizer menu.
+Fixed Marathon Mode Sector Y incorrect loading of bombs, lasers, lives, and scores.
+Fixed a potential crash after getting a game over then starting a game again.
+Small adjustment to randomizer menu text.
+Added Star Wolf on Bolse when in Marathon Mode.
+Initial progress on random portraits (not functional yet).
+
 Beta 21:
 Custom menu font is now bigger and should appear better on console.
 
