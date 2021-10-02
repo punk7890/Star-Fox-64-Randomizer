@@ -1,3 +1,7 @@
+Beta 23:
+Slightly different map / reflection color RNG for reflection and map colors.
+Added Random Portraits.
+
 Beta 22:
 Fixed hangs at the main menu / randomizer menu.
 Fixed Marathon Mode Sector Y incorrect loading of bombs, lasers, lives, and scores.
