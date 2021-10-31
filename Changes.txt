@@ -1,3 +1,8 @@
+Beta 24:
+Fixed MacBeth first path train boss error in Marathon Mode where the player would not be taken to the correct planet.
+Fixed Star Wolf not spawning on Bolse in Marathon mode. If the player played the entire intro sequence to the planet, Star Wolf would never spawn.
+Moved Star Wolf spawn on Katina to second phase of the level (only for Marathon mode).
+
 Beta 23:
 Slightly different map / reflection color RNG for reflection and map colors.
 Added Random Portraits.
