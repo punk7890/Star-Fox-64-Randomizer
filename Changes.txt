@@ -1,3 +1,9 @@
+Beta 25:
+Fixed MacBeth first path train boss error in Marathon Mode where the player would not be taken to the correct planet (again, whoops).
+Fixed an error if Random Expert / Warp Chance was on and the player retried at the planet screen, the settings wouldn't be correct.
+Allow Same Planets when off now works correctly.
+Added a button combination to return to the title screen if needed (D-Pad Up + C-Up + Start).
+
 Beta 24:
 Fixed MacBeth first path train boss error in Marathon Mode where the player would not be taken to the correct planet.
 Fixed Star Wolf not spawning on Bolse in Marathon mode. If the player played the entire intro sequence to the planet, Star Wolf would never spawn.
