@@ -1,3 +1,7 @@
+Beta 26:
+Minor adjustment to Macbeth end scene timer for warping to Training Mode (Marathon Mode only).
+Added random dialog (all voice and text lines are random).
+
 Beta 25:
 Fixed MacBeth first path train boss error in Marathon Mode where the player would not be taken to the correct planet (again, whoops).
 Fixed an error if Random Expert / Warp Chance was on and the player retried at the planet screen, the settings wouldn't be correct.
