@@ -8,7 +8,7 @@ This is currently in beta. Expect bugs. Please report any you may find.
 
 2. Expansion pack (or 8MB set on emulators).
 
-3. An US 1.0 version of the game. NOTE: The game dump *needs* to be in Big Endian byte order or patching the ROM cannot be done (you'll get an error in the ROM extracting tool).
+3. An US 1.0 version of the game. NOTE: The game dump *needs* to be in Big Endian byte order or patching the ROM cannot be done (you'll get an error in the ROM extracting tool). If you get an error, you can try byteswapping your ROM with this online tool: https://hack64.net/tools/swapper.php
 
 4. xdeltaUI https://www.romhacking.net/utilities/598/
 
