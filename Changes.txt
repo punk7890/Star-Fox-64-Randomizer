@@ -1,3 +1,31 @@
+March 17 2022:
+Added:
+
+Starting Bomb Count.
+Starting Lives.
+Starting Lasers.
+Extra Star Wolfs.
+Choose Planets.
+
+Adjustments:
+
+One Hit Kill has been changed to One Hit KO to better reflect that the player dies in one hit.
+
+Fixes:
+
+One Hit KO logic change to fix a rare bug.
+Retrying a level with random expert or random warp chance wouldn't properly understand the last state these values were in.
+
+Code Changes:
+
+Removed Katina / Bolse Star Wolf Marathon Mode logic and put it as a separate option.
+Added planet end screen logic for Choose Planets.
+Added planet intro logic for Choose Planets.
+
+Known Issues:
+
+The last planet when random planets is on will generally not report the correct planet in the score entry scene after the credits.
+
 Beta 26:
 Minor adjustment to Macbeth end scene timer for warping to Training Mode (Marathon Mode only).
 Added random dialog (all voice and text lines are random).
