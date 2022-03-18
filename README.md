@@ -50,7 +50,7 @@ Page 1 Options:
 * ONE HIT KO: Player dies in one hit.
 * RANDOM PORTRAITS: Speaking character portraits will be randomized based on the level ID.
 * RANDOM DIALOG: Random character voice lines and text.
-* CHOOSE PLANETS: Allows the player to select planets with the L button in the planet selection screen. Note: This will turn off RANDOM PLANETS, ALLOW SAME PLANETS, MARATHON MODE, and CHOOSE PLANETS if on.
+* CHOOSE PLANETS: Allows the player to select planets with the L button in the planet selection screen. Note: This will turn off RANDOM PLANETS, ALLOW SAME PLANETS, and MARATHON MODE if on.
 
 Page 2 Options:
 
