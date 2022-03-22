@@ -1,3 +1,21 @@
+March 21 2022:
+
+Added:
+Debug Cheats
+Text in-game if the player has Debug Cheats on.
+Text in the planet screen if the player has Choose Planets on.
+
+Fixes:
+Fixed a crash on hardware when selecting Extra Star Wolfs.
+Fixed a bug in Choose Planets where the end screen would stay on the screen.
+
+Adjustments:
+Debug cheats is off by default now.
+Marathon mode now starts in Training mode either from entering Training mode, or the planet screen.
+
+Code Changes:
+Marathon mode logic change.
+
 March 17 2022:
 Added:
 
