@@ -28,11 +28,12 @@ This is currently in beta. Expect bugs. Please report any you may find.
 In some cases, like on Project 64, the emulator will need to be set to use Interpreter Core in order to access the randomizer menu. Likely the prefered emulator would be Mupen for this mod as it appears to run at full speed.
 # Changing Options
 Once the patch is applied, press L button at the main menu to toggle options on or off. Use the D-Pad Up / Down to move the white cursor on the left side of the screen. Press A to change the state of an option.
-# The Options (March 17 2022)
+# The Options (April 7 2022)
 
 Page 1 Options:
 
-![STARFOX64_0000](https://user-images.githubusercontent.com/90301698/158906795-eae2c69c-e342-488d-9705-bb489f281060.png)
+![STARFOX64_0002](https://user-images.githubusercontent.com/90301698/162382529-124b6530-9b0d-43ac-9b49-43fe2fa081af.png)
+
 
 * RANDOM PLANETS: Enables randomized planets. Note: this will turn off MARATHON MODE and CHOOSE PLANETS if on.
 * RANDOM ITEMS: All item spawns will be random.
@@ -51,23 +52,30 @@ Page 1 Options:
 * RANDOM PORTRAITS: Speaking character portraits will be randomized based on the level ID.
 * RANDOM DIALOG: Random character voice lines and text.
 * CHOOSE PLANETS: Allows the player to select planets with the L button in the planet selection screen. Note: This will turn off RANDOM PLANETS, ALLOW SAME PLANETS, and MARATHON MODE if on.
+* BOSS RUSH MODE: Plays through all bosses in the game in order of blue path > yellow path > red path. There will be a "SCORE" counter on-screen that counts down for as long as you are in the level and then will be added to the "TOTAL" counter for your overall total score, including hits made in the level. The score for all stages except venoms will start counting down from 10,000. Entering Venom will start the player at Venom 1 > Tunnels 1 > Surface > Tunnels 2. The initial score counter starts at 30,000 and will take your final score once the player defeats brain andross and then exits the tunnels. If the player completes a stage in expert mode, they will gain +200 points added to final score.
 
 Page 2 Options:
 
-![STARFOX64_0001](https://user-images.githubusercontent.com/90301698/158907346-0901f9ea-1043-4e75-9b3f-4135cb652879.png)
+![STARFOX64_0003](https://user-images.githubusercontent.com/90301698/162382561-100b5d0c-1977-4619-bcbb-d19b42dc1312.png)
+
 
 * STARTING BOMBS: Changes the player's starting bomb count.
 * STARTING LIVES: Changes the player's starting live count.
 * STARTING LASER: Changes the player's starting laser type.
-* EXTRA STAR WOLFS: Star Wolf will spawn on Katina once the UFO appears and always be enabled on Bolse.
-
-# Debug Buttons
-While these will disrupt normal game-play, these were added to test various parts of the randomizer.
+* DEBUG CHEATS: While these will disrupt normal game-play, these were added to test various parts of the randomizer.
 
 Note: The player must have entered at least one planet at some point during the game session for these to work.
 
-* L + R + C-Left = 99 lives
-* L + R + C-Right = 9 bombs
-* L + R + C-Up = Complete level (may not work correctly in some cases)
-* L + R + C-Down (hold) = Restore Health
-* D-Pad Up + C-Up + Start = Reset to title screen
+    L + R + C-Left = 99 lives.
+    L + R + C-Right = 9 bombs.
+    L + R + C-Up = Complete level (may not work correctly in some cases).
+    L + R + C-Down = Restore health and wings.
+    L + R + B = Kills the player.
+    L + R + A = Add Hypers.
+    L (Hold) + Z (Tap): Enables or disables extra damage hyper lasers (bosses only).
+    L (Hold) + D-Pad Left (Tap) = Invincibility.
+    L (Hold) + D-Pad Right (Tap) = Enable or disable debug text display.
+    D-Pad Up + C-Up + Start = Reset to title screen.
+   
+* EXTRA STAR WOLFS: Star Wolf will spawn on Katina once the UFO appears and always be enabled on Bolse.
+* DRUNK MODE: Logic for camera behaviour changes for a more disoriented feel. Fox will also be a bit drunk.
