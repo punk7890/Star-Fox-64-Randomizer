@@ -28,7 +28,7 @@ This is currently in beta. Expect bugs. Please report any you may find.
 In some cases, like on Project 64, the emulator will need to be set to use Interpreter Core in order to access the randomizer menu. Likely the prefered emulator would be Mupen for this mod as it appears to run at full speed.
 # Changing Options
 Once the patch is applied, press L button at the main menu to toggle options on or off. Use the D-Pad Up / Down to move the white cursor on the left side of the screen. Press A to change the state of an option.
-# The Options (April 7 2022)
+# The Options (April 10 2022)
 
 Page 1 Options:
 
@@ -56,7 +56,7 @@ Page 1 Options:
 
 Page 2 Options:
 
-![STARFOX64_0003](https://user-images.githubusercontent.com/90301698/162382561-100b5d0c-1977-4619-bcbb-d19b42dc1312.png)
+![STARFOX64_0000](https://user-images.githubusercontent.com/90301698/162666809-ec1fa62a-6967-4402-8052-7283aedca322.png)
 
 
 * STARTING BOMBS: Changes the player's starting bomb count.
@@ -79,3 +79,4 @@ Note: The player must have entered at least one planet at some point during the 
    
 * EXTRA STAR WOLFS: Star Wolf will spawn on Katina once the UFO appears and always be enabled on Bolse.
 * DRUNK MODE: Logic for camera behaviour changes for a more disoriented feel. Fox will also be a bit drunk.
+* RANDOM DEATH ITEM: Randomly selects an item per level that will kill the player if collected.
