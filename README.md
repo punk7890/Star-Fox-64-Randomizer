@@ -26,8 +26,20 @@ This is currently in beta. Expect bugs. Please report any you may find.
 4. Open xdeltaUI and apply "rando.xdelta" to your rebuilt ROM.
 
 In some cases, like on Project 64, the emulator will need to be set to use Interpreter Core in order to access the randomizer menu. Likely the prefered emulator would be Mupen for this mod as it appears to run at full speed.
+
+# For Contributing
+
+You will need the ARMIPS exe to compile your code changes for testing. Grab it here and select the latest automated build: https://github.com/Kingcom/armips 
+
+1. Run Compile-log.bat (this also outputs a log file for useful debugging)
+2. Copy the bytes from "Randomizer.bin".
+3. From your already modified DECOMPRESSED ROM (rando.xdelta patch already applied), paste the bytes in "Randomizer.bin" to your ROM at 0x00EFB0B0. Make sure you aren't adding bytes, but overwritting existing bytes at that location.
+4. Save and test your edits.
+
 # Changing Options
+
 Once the patch is applied, press L button at the main menu to toggle options on or off. Use the D-Pad Up / Down to move the white cursor on the left side of the screen. Press A to change the state of an option.
+
 # The Options (April 23 2022)
 
 Page 1 Options:
