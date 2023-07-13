@@ -143,6 +143,27 @@ gRandomItemDropsTable:		;item ids, leave -1 after last valid entry
 .d32 @ID_REPAIR
 .d32 0xFFFFFFFF
 
+gRandomDeathItemFlag:
+.d32 0
+gRandomDeathItemCycle:
+.d32 0
+gRandomDeathItemTable:
+
+	/* Item ID defines */
+		@ID_CHECKPOINT equ 0x143
+		@ID_BLUEWARP equ 0x146
+	
+.d32 @ID_LASER
+.d32 @ID_SILVER
+.d32 @ID_STAR
+.d32 @ID_BOMB
+.d32 @ID_LIFE
+.d32 @ID_GOLD
+.d32 @ID_REPAIR
+.d32 @ID_CHECKPOINT
+.d32 @ID_BLUEWARP
+.d32 0
+
 gItemDropFunctionHookValue:		;clever ways of creating calls to custom functions that will move around as the code becomes bigger
 jal SUB_CustomItemDropFunction
 nop

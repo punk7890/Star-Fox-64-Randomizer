@@ -743,7 +743,7 @@ TBL_FUNC_RandomItems:		;random item spawns
 		sw.l r0, (@LOC_ZERO)
 		li v0, @RESTORE_HOOK
 		sw.u v0, @LOC_ITEM_HOOK
-		b (NextTableEntry)
+		j (NextTableEntry)
 		sw.l v0, @LOC_ITEM_HOOK
 		nop
 		
@@ -751,7 +751,7 @@ TBL_FUNC_RandomItems:		;random item spawns
 
 	lw v0, orga(gItemDropFunctionHookValue) (gp)
 	sw.u v0, (@LOC_ITEM_HOOK)
-	b NextTableEntry
+	j NextTableEntry
 	sw.l v0, (@LOC_ITEM_HOOK)
 	nop
 	
@@ -780,6 +780,50 @@ SUB_CustomItemDropFunction:
 	jr ra
 	lh v0, 0x0010(s0)
 	nop
+	
+TBL_FUNC_RandomDeathItem:		;Randomizes death item in main menu, and map screen. Overrides certain op codes depending on item. Restores item op codes when in main menu if this option is off.
+
+;todo
+;bomb fix for zones
+;put check for if random items is on
+;put checks for certain items per level
+;the rest
+
+	/* Item ID defines */
+	@ID_CHECKPOINT equ 0x143
+	@ID_BLUEWARP equ 0x146
+
+
+	lw v0, orga(gRandomDeathItemFlag)(gp)
+	beq v0, r0, (@@FixOpCodes)
+	lui t3, 0x8006
+		jal CheckIfMainMenu
+		li t0, 0x3E8
+		beq v0, t0, (@@CycleStates)
+		nop
+			jal CheckMapScreenState
+			li t0, 3
+			beq v0, t0, (@@CycleStates)
+			li t0, 6
+				beq v0, t0, (@@CycleStates)
+				nop
+				j (NextTableEntry)
+				nop
+				
+@@CycleStates:	;put level checks and if random items checks is on in here
+
+	lw a0, orga(gRandomDeathItemCycle)(gp)
+	
+	j (NextTableEntry)
+	nop
+	
+	
+	
+@@FixOpCodes:
+
+	j (NextTableEntry)
+	nop
+	
 	
 TBL_FUNC_RainbowBombs:		;overrides the color entry for bomb color per frame
 

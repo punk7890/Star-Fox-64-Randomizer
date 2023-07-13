@@ -32,7 +32,7 @@ RandoSetups:
 	jal CheckIfMainMenu		;check if in main menu
 	li t7, 0x3E8
 	bne v0, t7, (@@Exit)
-		lw v0, orga(gMainMenuTextHookValue) (gp)
+	lw v0, orga(gMainMenuTextHookValue) (gp)
 		sw v0, (0x8018996c)		;store menu text hook at end of main menu loop in code
 		lw v0, orga(gInGameTextHookValue) (gp)
 		sw v0, (0x8009f0d8)		;stores hook value to create a routine for in-game text
@@ -59,16 +59,16 @@ RandoSetups:
 		andi a0, v1, BUTTON_L16		;check if L pressed
 		beq a0, r0, (@@LoadPlayerInfo)
 		nop
-		jal AddToRandomizerMenuValue
-		nop
-		jal CheckRandomizerMenu
-		li t7, -1
+			jal AddToRandomizerMenuValue
+			nop
+			jal CheckRandomizerMenu
+			li t7, -1
 		beq v0, t7, (@@DisableMenu)		;disable menu if over valid menu IDs
 		nop
-		jal EnableRandomizerMenu
-		nop
-		b @@LoadPlayerInfo
-		nop
+				jal EnableRandomizerMenu
+				nop
+					b @@LoadPlayerInfo
+					nop
 @@DisableMenu:
 		jal DisableRandomizerMenu
 		nop
