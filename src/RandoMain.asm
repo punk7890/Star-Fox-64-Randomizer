@@ -787,6 +787,7 @@ TBL_FUNC_RandomDeathItem:		;Randomizes death item in main menu, and map screen. 
 ;bomb fix for zones
 ;put check for if random items is on
 ;put checks for certain items per level
+;put in-game venom checks
 ;the rest
 
 	/* Item ID defines */
@@ -813,11 +814,123 @@ TBL_FUNC_RandomDeathItem:		;Randomizes death item in main menu, and map screen. 
 @@CycleStates:	;put level checks and if random items checks is on in here
 
 	lw a0, orga(gRandomDeathItemCycle)(gp)
-	
+	addiu a0, a0, 1
+	sltiu v1, a0, 9
+	beql v1, r0, (@@ResetSeek)	;if 9 or over, reset seek
+	or a0, a0, r0
+@@ResetSeek:
+	sw a0, orga(gRandomDeathItemCycle)(gp)
+	sll a1, a0, 2
+	addu t9, gp, a1
+	lw a2, orga(gRandomDeathItemTable)(t9)
+	sw a2, orga(gRandomDeathItemCurrentItem) (gp)
+	jal GetLevelID
+	lw t1, orga(gRandomItemDropsFlag) (gp)	;random item flag in t1
+	beq v0, r0, (@@CorneriaChecks)
+	li v1, 0x1
+	beq v0, v1, (@@MeteoChecks)
+	li v1, 0x2
+	beq v0, v1, (@@MeteoChecks) ;(@@SEXChecks)	Sector X and Meteo are the same
+	li v1, 0x3
+	beq v0, v1, (@@CorneriaChecks) ;(@@A6Checks) Area 6 is the same as Corneria
+	li v1, 0x5
+	beq v0, v1, (@@CorneriaChecks) ;(@@SYChecks)
+	li v1, 0x6
+	beq v0, v1, (@@VE1Checks)	;to do
+	li v1, 0x7
+	beq v0, v1, (@@CorneriaChecks) ;(@@SolarChecks)
+	li v1, 0x8
+	beq v0, v1, (@@ZonessChecks)
+	li v1, 0x9
+	beq v0, v1, (@@TunnelsChecks)	;to do
+	li v1, 0xA
+	beq v0, v1, (@@TrainingChecks)	;to do
+	li v1, 0xB
+	beq v0, v1, (@@MacBethChecks)
+	li v1, 0xC
+	beq v0, v1, (@@AquasChecks)
+	li v1, 0xE
+	beq v0, v1, (@@FortunaChecks)
+	li v1, 0x10
+	beq v0, v1, (@@KatinaChecks)
+	li v1, 0x11
+	beq v0, v1, (@@BolseChecks)
+	li v1, 0x12
+	beq v0, v1, (@@SZChecks)
+	li v1, 0x13
+	beq v0, v1, (@@VESurfaceChecks)
+	nop
 	j (NextTableEntry)
 	nop
 	
+@@CorneriaChecks:
+	;checks for if random items is on or not
+	beq t1, r0, (@@CornNormal)	;t1 = gRandomItemDropsFlag
+	li v1, @ID_BLUEWARP		;if blue warp, get new item since it's not valid on this level
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_LASER	;delay slot is new death item.
+	b (@@ItemChecks)
+	nop
 	
+@@CornNormal:
+	li v1, @ID_STAR		;stars are rare enough to omit, so get new item
+	beql v1, a2, (@@SortItem)	;delay slot is new item
+	li a2, @ID_BOMB
+	li v1, @ID_BLUEWARP
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_LASER
+	li v1, @ID_LIFE		;lifes are rare enough to omit, so get new item
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_SILVER
+	b (@@ItemChecks)
+	nop
+	
+@@MeteoChecks:		;if random items is on, no need to cycle to a new item as all items are in this level
+	beq t1, r0, (@@MeteoNormal)
+	nop
+	b (@@ItemChecks)
+	nop
+	
+@@MeteoNormal:
+	li v1, @ID_STAR		;stars are rare enough to omit, so get new item
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_BOMB
+	li v1, @ID_LIFE		;lifes are rare enough to omit, so get new item
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_SILVER
+	b (@@ItemChecks)
+	nop
+	
+@@ZonessChecks:
+	beq t1, r0, (@@ZonessNormal)
+	nop
+	li v1, @ID_BLUEWARP
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_LASER
+	b (@@ItemChecks)
+	nop
+	
+@@ZonessNormal:
+	li v1, @ID_BLUEWARP
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_LASER
+	li v1, @ID_LIFE
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_SILVER
+	li v1, @ID_BOMB
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_GOLD
+	b (@@ItemChecks)
+	nop
+	
+@@SortItem:
+	b (@@ItemChecks)
+	sw a2, orga(gRandomDeathItemCurrentItem) (gp)
+	nop
+	
+
+@@ItemChecks:		;put checks if item, then op code writes
+
 	
 @@FixOpCodes:
 
@@ -838,7 +951,7 @@ TBL_FUNC_RainbowBombs:		;overrides the color entry for bomb color per frame
 	nop
 	sw r0, orga(gRainbowBombColorSeek) (gp)
 @@End:
-	b NextTableEntry
+	j NextTableEntry
 	nop
 @@Restore:
 	li v0, 0x2401FF00 ;addiu at, r0, 0xff00
