@@ -382,6 +382,22 @@ RandomOptionsPage1:
 	li a0, @CENTER_A0
 	jal @FUNC_RENDER_TEXT
 	li a1, @CENTER_MENU_ITEM_9_A1
+	li s6, @G_SETPRIMCOLOR		;menu option 9 start
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	lw t7, orga(gUserMenuColorValue) (gp)
+	sw t7, 0x0004(s0)
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, RandomDeathItemText
+	sw t8, 0x0010(sp)
+	li a0, @CENTER_A0
+	jal @FUNC_RENDER_TEXT
+	li a1, @CENTER_MENU_ITEM_10_A1
 	lw a0, orga(gMenuCursorValue) (gp)
 	lw a1, orga(gRandomizerPage1MaxOptions) (gp)
 	sltu v0, a0, a1
@@ -461,6 +477,8 @@ RandomOptionsPage1:
 	beq a0, v0, (@@RandomOptionsPage1Option7)
 	li v0, 8
 	beq a0, v0, (@@RandomOptionsPage1Option8)
+	li v0, 9
+	beq a0, v0, (@@RandomOptionsPage1Option9)
 	nop
 	b (@@RenderOnOffText)
 	nop
@@ -523,6 +541,12 @@ RandomOptionsPage1:
 	xori a0, a0, 1
 	b (@@RenderOnOffText)
 	sw a0, orga(gRandomColorsActiveFlag) (gp)
+	nop
+@@RandomOptionsPage1Option9:
+	lw a0, orga(gRandomDeathItemFlag) (gp)
+	xori a0, a0, 1
+	b (@@RenderOnOffText)
+	sw a0, orga(gRandomDeathItemFlag) (gp)
 	nop
 	
 	
@@ -600,9 +624,17 @@ RandomOptionsPage1:
 		li a1, @CENTER_MENU_ITEM_9_A1
 		jal PrintOnOffText
 		sw a1, orga(gYposToRender) (gp)
-		b (ExitRandomizerMenu)
 		
+		li v0, gRandomDeathItemFlag
+		sw v0, orga(gOnOffLocationToRender) (gp)
+		li a0, @CENTER_MENU_ITEM_OFF_A0
+		sw a0, orga(gXposToRender) (gp)
+		li a1, @CENTER_MENU_ITEM_10_A1
+		jal PrintOnOffText
+		sw a1, orga(gYposToRender) (gp)
+		b (ExitRandomizerMenu)
 		nop
+		
 RandomOptionsPage2:
 	li s6, @G_SETPRIMCOLOR
 	lw s0, 0x0000(s2)

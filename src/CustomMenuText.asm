@@ -34,11 +34,11 @@ OFFText:
 .align 4,0
 
 RandomizerPage1Text:
-.asciiz "RANDOMIZER OPTIONS P1"
+.asciiz "RANDOMIZER OPTIONS 1"
 .align 4,0
 
 RandomizerPage2Text:
-.asciiz "RANDOMIZER OPTIONS P2"
+.asciiz "RANDOMIZER OPTIONS 2"
 .align 4,0
 
 RandomizerSpecialModesP1Text:
@@ -99,6 +99,10 @@ RandomDialogText:
 
 RandomMapColorsText:
 .asciiz "RANDOM MAP COLORS"
+.align 4,0
+
+RandomDeathItemText:
+.asciiz "RANDOM DEATH ITEM"
 .align 4,0
 
 RainbowBombsText:

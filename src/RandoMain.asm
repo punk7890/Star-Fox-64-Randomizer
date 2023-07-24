@@ -783,43 +783,66 @@ SUB_CustomItemDropFunction:
 	
 TBL_FUNC_RandomDeathItem:		;Randomizes death item in main menu, and map screen. Overrides certain op codes depending on item. Restores item op codes when in main menu if this option is off.
 
-;todo
-;bomb fix for zones
-;put check for if random items is on
-;put checks for certain items per level
-;put in-game venom checks
-;the rest
-
 	/* Item ID defines */
 	@ID_CHECKPOINT equ 0x143
 	@ID_BLUEWARP equ 0x146
 
 
 	lw v0, orga(gRandomDeathItemFlag)(gp)
-	beq v0, r0, (@@FixOpCodes)
-	lui t3, 0x8006
+	beq v0, r0, (@@MainMenuFixOpCodes)
+	nop
 		jal CheckIfMainMenu
 		li t0, 0x3E8
-		beq v0, t0, (@@CycleStates)
-		nop
+		beql v0, t0, (@@CycleStates)
+		sw r0, orga(gRandomDeathItemInGameFlag) (gp)
 			jal CheckMapScreenState
 			li t0, 3
 			beq v0, t0, (@@CycleStates)
 			li t0, 6
 				beq v0, t0, (@@CycleStates)
 				nop
-				j (NextTableEntry)
-				nop
-				
-@@CycleStates:	;put level checks and if random items checks is on in here
-
+@@Ingamechecks:
+					jal CheckFoxState		;check if in end scene, if so unset flag and cycle states
+					li t1, 0x7
+					beql v0, t1, (@@CycleStates) ;(@@ContinueInGameChecks1)
+					sw r0, orga(gRandomDeathItemInGameFlag) (gp)
+@@ContinueInGameChecks1:
+						lw v0, (LOC_ALIVE_TIMER32)
+						li v1, 0x3
+						beq v0, v1, (@@FixOpCodes)	;check if third frame of entering level, if so restore other op codes
+						li v1, 0x2
+						beq v0, v1, (@@CheckIfFoxAlive)	;check if second frame of entering level
+						nop
+								
+@@EndInGameChecks:
+	j (NextTableEntry)
+	nop
+@@CheckIfFoxAlive:
+	jal CheckFoxState		;check if Fox is alive or in intro state. If not, don't set in-game flag and end.
+	li t0, 0x2
+	beq t0, v0, (@@SetFlagAndEnd)
+	li t0, 0x3
+	beq t0, v0, (@@SetFlagAndEnd)
+	li t0, 0x5
+	beq t0, v0, (@@SetFlagAndEnd)
+	nop
+	j (NextTableEntry)
+	nop
+@@SetFlagAndEnd:
+	jal @@SetDoneInGameFlag
+	nop
+	j (NextTableEntry)
+	nop
+@@CycleStates:
 	lw a0, orga(gRandomDeathItemCycle)(gp)
 	addiu a0, a0, 1
 	sltiu v1, a0, 9
-	beql v1, r0, (@@ResetSeek)	;if 9 or over, reset seek
-	or a0, a0, r0
+	beql v1, r0, (@@ResetSeek)	;if 9 or over, take delay slot to reset seek
+	or a0, r0, r0
 @@ResetSeek:
 	sw a0, orga(gRandomDeathItemCycle)(gp)
+	lw v0, orga(gRandomDeathItemInGameFlag) (gp)
+	bne v0, r0, (@@End)		;if in-game flag set, end routine
 	sll a1, a0, 2
 	addu t9, gp, a1
 	lw a2, orga(gRandomDeathItemTable)(t9)
@@ -836,27 +859,29 @@ TBL_FUNC_RandomDeathItem:		;Randomizes death item in main menu, and map screen. 
 	li v1, 0x5
 	beq v0, v1, (@@CorneriaChecks) ;(@@SYChecks)
 	li v1, 0x6
-	beq v0, v1, (@@VE1Checks)	;to do
+	beq v0, v1, (@@VE1Checks)
 	li v1, 0x7
 	beq v0, v1, (@@CorneriaChecks) ;(@@SolarChecks)
 	li v1, 0x8
 	beq v0, v1, (@@ZonessChecks)
 	li v1, 0x9
-	beq v0, v1, (@@TunnelsChecks)	;to do
+	beq v0, v1, (@@TunnelsChecks)
 	li v1, 0xA
 	beq v0, v1, (@@TrainingChecks)	;to do
 	li v1, 0xB
 	beq v0, v1, (@@MacBethChecks)
 	li v1, 0xC
+	beq v0, v1, (@@MacBethChecks) ;(@@TitChecks)
+	li v1, 0xD
 	beq v0, v1, (@@AquasChecks)
 	li v1, 0xE
 	beq v0, v1, (@@FortunaChecks)
 	li v1, 0x10
-	beq v0, v1, (@@KatinaChecks)
+	beq v0, v1, (@@FortunaChecks) ;(@@KatinaChecks)
 	li v1, 0x11
-	beq v0, v1, (@@BolseChecks)
+	beq v0, v1, (@@FortunaChecks) ;(@@BolseChecks)
 	li v1, 0x12
-	beq v0, v1, (@@SZChecks)
+	beq v0, v1, (@@FortunaChecks) ;(@@SZChecks)
 	li v1, 0x13
 	beq v0, v1, (@@VESurfaceChecks)
 	nop
@@ -864,8 +889,9 @@ TBL_FUNC_RandomDeathItem:		;Randomizes death item in main menu, and map screen. 
 	nop
 	
 @@CorneriaChecks:
-	;checks for if random items is on or not
-	beq t1, r0, (@@CornNormal)	;t1 = gRandomItemDropsFlag
+	; jal @@SetDoneInGameFlag		;when entering, set done in-game flag.
+	; nop
+	beq t1, r0, (@@CornNormal)		;checks for if random items is on or not, t1 = gRandomItemDropsFlag
 	li v1, @ID_BLUEWARP		;if blue warp, get new item since it's not valid on this level
 	beql v1, a2, (@@SortItem)
 	li a2, @ID_LASER	;delay slot is new death item.
@@ -885,8 +911,10 @@ TBL_FUNC_RandomDeathItem:		;Randomizes death item in main menu, and map screen. 
 	b (@@ItemChecks)
 	nop
 	
-@@MeteoChecks:		;if random items is on, no need to cycle to a new item as all items are in this level
-	beq t1, r0, (@@MeteoNormal)
+@@MeteoChecks:
+	; jal @@SetDoneInGameFlag	
+	; nop
+	beq t1, r0, (@@MeteoNormal)	;if random items is on, no need to cycle to a new item as all items are in this level
 	nop
 	b (@@ItemChecks)
 	nop
@@ -901,8 +929,39 @@ TBL_FUNC_RandomDeathItem:		;Randomizes death item in main menu, and map screen. 
 	b (@@ItemChecks)
 	nop
 	
-@@ZonessChecks:
-	beq t1, r0, (@@ZonessNormal)
+@@MacBethChecks:
+	; jal @@SetDoneInGameFlag	
+	; nop
+	beq t1, r0, (@@MacBethNormal)
+	li v1, @ID_BLUEWARP
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_SILVER
+	b (@@ItemChecks)
+	nop
+	
+@@MacBethNormal:
+	li v1, @ID_STAR
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_BOMB
+	li v1, @ID_LIFE
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_GOLD
+	li v1, @ID_BLUEWARP
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_SILVER
+	li v1, @ID_LASER
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_CHECKPOINT
+	li v1, @ID_REPAIR
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_SILVER
+	b (@@ItemChecks)
+	nop
+	
+@@AquasChecks:
+	; jal @@SetDoneInGameFlag	
+	; nop
+	beq t1, r0, (@@AquasNormal)
 	nop
 	li v1, @ID_BLUEWARP
 	beql v1, a2, (@@SortItem)
@@ -910,7 +969,7 @@ TBL_FUNC_RandomDeathItem:		;Randomizes death item in main menu, and map screen. 
 	b (@@ItemChecks)
 	nop
 	
-@@ZonessNormal:
+@@AquasNormal:
 	li v1, @ID_BLUEWARP
 	beql v1, a2, (@@SortItem)
 	li a2, @ID_LASER
@@ -923,17 +982,387 @@ TBL_FUNC_RandomDeathItem:		;Randomizes death item in main menu, and map screen. 
 	b (@@ItemChecks)
 	nop
 	
+@@ZonessChecks:
+	; jal @@SetDoneInGameFlag		
+	; nop
+	beq t1, r0, (@@ZonessNormal)		
+	li v1, @ID_BLUEWARP
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_LASER
+	li v1, @ID_BOMB
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_STAR
+	b (@@ItemChecks)
+	nop
+	
+@@ZonessNormal:
+	li v1, @ID_STAR
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_GOLD
+	li v1, @ID_BLUEWARP
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_LASER
+	li v1, @ID_LIFE
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_SILVER
+	li v1, @ID_BOMB
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_CHECKPOINT
+	b (@@ItemChecks)
+	nop
+	
+@@FortunaChecks:
+	; jal @@SetDoneInGameFlag	
+	; nop
+	beq t1, r0, (@@FortunaNormal)
+	nop
+	li v1, @ID_BLUEWARP
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_LASER
+	li v1, @ID_CHECKPOINT
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_SILVER
+	b (@@ItemChecks)
+	nop
+	
+@@FortunaNormal:
+	li v1, @ID_BLUEWARP
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_LASER
+	li v1, @ID_CHECKPOINT
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_SILVER
+	li v1, @ID_LIFE
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_GOLD
+	b (@@ItemChecks)
+	nop
+	
+@@VE1Checks:
+	; jal @@SetDoneInGameFlag	
+	; nop
+	beq t1, r0, (@@VE1Normal)
+	li v1, @ID_BLUEWARP
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_SILVER
+	b (@@ItemChecks)
+	nop
+	
+@@VE1Normal:
+	li v1, @ID_BLUEWARP
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_LASER
+	li v1, @ID_LIFE
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_SILVER
+	b (@@ItemChecks)
+	nop
+	
+	
+@@TunnelsChecks:
+	; jal @@SetDoneInGameFlag	
+	; nop
+	lw v1, (LOC_SUB_SECTION_FLAG32)		;load flag if on tunnels 2
+	beq t1, r0, (@@TunnelsNotRandomItems)
+	nop
+	beq v1, r0, (@@Tunnels2)	;check if on tunnels 2
+	li v1, @ID_BLUEWARP
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_GOLD
+	li v1, @ID_CHECKPOINT
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_LASER
+	b (@@ItemChecks)
+	nop
+	
+@@TunnelsNotRandomItems:
+	beq v1, r0, (@@Tunnels2)	;check if on tunnels 2
+	li v1, @ID_BLUEWARP
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_GOLD
+	li v1, @ID_LIFE
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_LASER
+	li v1, @ID_CHECKPOINT
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_BOMB
+	b (@@ItemChecks)
+	nop
+	
+@@Tunnels2:
+	li v1, @ID_BLUEWARP
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_GOLD
+	li v1, @ID_CHECKPOINT
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_BOMB
+	b (@@ItemChecks)
+	nop
+	
+@@TrainingChecks:
+	; jal @@SetDoneInGameFlag	
+	; nop
+	li v1, @ID_BLUEWARP
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_LASER
+	li v1, @ID_CHECKPOINT
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_SILVER
+	b (@@ItemChecks)
+	nop
+	
+@@VESurfaceChecks:
+	; jal @@SetDoneInGameFlag	
+	; nop
+	beq t1, r0, (@@VESurfaceNormal)
+	li v1, @ID_BLUEWARP
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_SILVER
+	li v1, @ID_CHECKPOINT
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_BOMB
+	b (@@ItemChecks)
+	nop
+	
+@@VESurfaceNormal:
+	li v1, @ID_BLUEWARP
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_SILVER
+	li v1, @ID_CHECKPOINT
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_BOMB
+	li v1, @ID_GOLD
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_STAR
+	li v1, @ID_LIFE
+	beql v1, a2, (@@SortItem)
+	li a2, @ID_REPAIR
+	b (@@ItemChecks)
+	nop
+	
+	
 @@SortItem:
 	b (@@ItemChecks)
 	sw a2, orga(gRandomDeathItemCurrentItem) (gp)
 	nop
+
+@@SetDoneInGameFlag:		;simply sets done in-game flag.
+	li v0, 1
+	jr ra
+	sw v0, orga(gRandomDeathItemInGameFlag) (gp)
+	nop
+	
+@@ItemChecks:		;Checks if item then overwrites op codes from in-game code
+	lui t3, 0x8006
+	li v1, @ID_LASER
+	bne v1, a2, (@@IfCheckPoint)
+	li v1, 0x240F0004
+	sw v1, 0x38f4(t3)
+	li v1, 0x8CE80000
+	sw v1, 0x3900(t3)
+	li v1, 0xAD0F01C8
+	sw v1, 0x3918(t3)
+@@IfCheckPoint:
+	li v1, @ID_CHECKPOINT
+	bne v1, a2, (@@IfSilverRing)
+	li v1, 0x24030004
+	sw v1, 0x46bc(t3)
+	li v1, 0xA200004C
+	sw v1, 0x46c0(t3)
+	li v1, 0x080191F1
+	sw v1, 0x46c4(t3)
+	li v1, 0xAC4301C8
+	sw v1, 0x46c8(t3)
+@@IfSilverRing:
+	li v1, @ID_SILVER
+	bne v1, a2, (@@IfStar)
+	li v1, 0x240D0004
+	sw v1, 0x3c6c(t3)
+	li v1, 0xAC4D01C8
+	sw v1, 0x3c70(t3)
+@@IfStar:
+	li v1, @ID_STAR
+	bne v1, a2, (@@IfBlueWarp)
+	li v1, 0x240F0004
+	sw v1, 0x3e44(t3)
+	li v1, 0xAC4F01C8
+	sw v1, 0x3e48(t3)
+@@IfBlueWarp:
+	li v1, @ID_BLUEWARP
+	bne v1, a2, (@@IfBomb)
+	li v1, 0x4
+	sh v1, 0x43ae(t3)
+	li v1, 0x1C8
+	sh v1, 0x43b6(t3)
+@@IfBomb:
+	li v1, @ID_BOMB
+	bne v1, a2, (@@IfLife)
+	li v1, 0x240D0004
+	sw v1, 0x3824(t3)
+	li v1, 0xADCD01C8
+	sw v1, 0x3828(t3)
+@@IfLife:
+	li v1, @ID_LIFE
+	bne v1, a2, (@@IfGoldRing)
+	li v1, 0x3C018017
+	sw v1, 0x3720(t3)
+	li v1, 0x8C21E0F0
+	sw v1, 0x3724(t3)
+	li v1, 0x240C0004
+	sw v1, 0x3744(t3)
+	li v1, 0xAC2C01C8
+	sw v1, 0x3748(t3)
+@@IfGoldRing:
+	li v1, @ID_GOLD
+	bne v1, a2, (@@IfWingRepair)
+	li v1, 0x24180004
+	sw v1, 0x3dec(t3)
+	li v1, 0xAC5801C8
+	sw v1, 0x3df0(t3)
+@@IfWingRepair:
+	li v1, @ID_REPAIR
+	bne v1, a2, (@@EndItemChecks)
+	li v1, 0x4
+	sb v1, 0x361b(t3)
+	li v1, 0xAC5901C8
+	sw v1, 0x362c(t3)
+@@EndItemChecks:
+	j (NextTableEntry)
+	nop
+	
+	
+@@FixOpCodes:		;if death item is a given item, skip restoring game op codes for that item.
+	lw a2, orga(gRandomDeathItemCurrentItem) (gp)
+	li v1, @ID_LASER
+	beq v1, a2, (@@IfCheckPointFix)
+	lui t3, 0x8006
+	li v1, 0xAC4F0000
+	sw v1, 0x38f4(t3)
+	li v1, 0x24080002
+	sw v1, 0x3900(t3)
+	li v1, 0x54200004
+	sw v1, 0x3918(t3)
+@@IfCheckPointFix:
+	li v1, @ID_CHECKPOINT
+	beq v1, a2, (@@IfSilverRingFix)
+	li v1, 0x8609004E
+	sw v1, 0x46bc(t3)
+	li v1, 0x3C068017
+	sw v1, 0x46c0(t3)
+	li v1, 0x24C6E0F0
+	sw v1, 0x46c4(t3)
+	li v1, 0x00095080
+	sw v1, 0x46c8(t3)
+@@IfSilverRingFix:
+	li v1, @ID_SILVER
+	beq v1, a2, (@@IfStarFix)
+	li v1, 0x258D0020
+	sw v1, 0x3c6c(t3)
+	li v1, 0xAC4D026C
+	sw v1, 0x3c70(t3)
+@@IfStarFix:
+	li v1, @ID_STAR
+	beq v1, a2, (@@IfBlueWarpFix)
+	li v1, 0x25CF0080
+	sw v1, 0x3e44(t3)
+	li v1, 0xAC4F026C
+	sw v1, 0x3e48(t3)
+@@IfBlueWarpFix:
+	li v1, @ID_BLUEWARP
+	beq v1, a2, (@@IfBombFix)
+	li v1, 0x64
+	sh v1, 0x43ae(t3)
+	li v1, 0x27C
+	sh v1, 0x43b6(t3)
+@@IfBombFix:
+	li v1, @ID_BOMB
+	beq v1, a2, (@@IfLifeFix)
+	li v1, 0x258D0001
+	sw v1, 0x3824(t3)
+	li v1, 0xAC4D0000
+	sw v1, 0x3828(t3)
+@@IfLifeFix:
+	li v1, @ID_LIFE
+	beq v1, a2, (@@IfGoldRingFix)
+	li v1, 0x2401000A
+	sw v1, 0x3720(t3)
+	li v1, 0x5321000A
+	sw v1, 0x3724(t3)
+	li v1, 0x256C0001
+	sw v1, 0x3744(t3)
+	li v1, 0xA44C0000
+	sw v1, 0x3748(t3)
+@@IfGoldRingFix:
+	li v1, @ID_GOLD
+	beq v1, a2, (@@IfWingRepair)
+	li v1, 0x25F80020
+	sw v1, 0x3dec(t3)
+	li v1, 0xAC58026C
+	sw v1, 0x3df0(t3)
+@@IfWingRepairFix:
+	li v1, @ID_REPAIR
+	beq v1, a2, (@@EndFixOpCodes)
+	li v1, 0x2
+	sb v1, 0x361b(t3)
+	li v1, 0x10200006
+	sw v1, 0x362c(t3)
+@@EndFixOpCodes:
+	j (NextTableEntry)
+	nop
 	
 
-@@ItemChecks:		;put checks if item, then op code writes
-
-	
-@@FixOpCodes:
-
+@@MainMenuFixOpCodes:		;fixes all op codes when at main menu
+	jal CheckIfMainMenu
+	li t0, 0x3E8
+	bne v0, t0, (@@End)
+	lui t3, 0x8006
+	li v1, 0xAC4F0000
+	sw v1, 0x38f4(t3)
+	li v1, 0x24080002
+	sw v1, 0x3900(t3)
+	li v1, 0x54200004
+	sw v1, 0x3918(t3)
+	li v1, 0x8609004E
+	sw v1, 0x46bc(t3)
+	li v1, 0x3C068017
+	sw v1, 0x46c0(t3)
+	li v1, 0x24C6E0F0
+	sw v1, 0x46c4(t3)
+	li v1, 0x00095080
+	sw v1, 0x46c8(t3)
+	li v1, 0x258D0020
+	sw v1, 0x3c6c(t3)
+	li v1, 0xAC4D026C
+	sw v1, 0x3c70(t3)
+	li v1, 0x25CF0080
+	sw v1, 0x3e44(t3)
+	li v1, 0xAC4F026C
+	sw v1, 0x3e48(t3)
+	li v1, 0x64
+	sh v1, 0x43ae(t3)
+	li v1, 0x27C
+	sh v1, 0x43b6(t3)
+	li v1, 0x258D0001
+	sw v1, 0x3824(t3)
+	li v1, 0xAC4D0000
+	sw v1, 0x3828(t3)
+	li v1, 0x2401000A
+	sw v1, 0x3720(t3)
+	li v1, 0x5321000A
+	sw v1, 0x3724(t3)
+	li v1, 0x256C0001
+	sw v1, 0x3744(t3)
+	li v1, 0xA44C0000
+	sw v1, 0x3748(t3)
+	li v1, 0x25F80020
+	sw v1, 0x3dec(t3)
+	li v1, 0xAC58026C
+	sw v1, 0x3df0(t3)
+	li v1, 0x2
+	sb v1, 0x361b(t3)
+	li v1, 0x10200006
+	sw v1, 0x362c(t3)
+@@End:
 	j (NextTableEntry)
 	nop
 	

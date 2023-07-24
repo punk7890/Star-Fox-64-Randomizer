@@ -63,8 +63,8 @@ RandoSetups:
 			nop
 			jal CheckRandomizerMenu
 			li t7, -1
-		beq v0, t7, (@@DisableMenu)		;disable menu if over valid menu IDs
-		nop
+			beq v0, t7, (@@DisableMenu)		;disable menu if over valid menu IDs
+			nop
 				jal EnableRandomizerMenu
 				nop
 					b @@LoadPlayerInfo

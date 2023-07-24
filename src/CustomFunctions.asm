@@ -344,7 +344,7 @@ LoadPlayerInfoAsArguments:		;loads player info from Global Pointer into temp reg
 	lw t2, orga(gPreviousTotalScore)(gp)	;total score in t2
 	lw t3, orga(gPreviousBombs)(gp)		;bombs in t3
 	jr ra
-	lw t4, orga(gPreviousLevel)(gp)		;level ID in t4
+	lw t4, orga(gPreviousLevel)(gp)		;previous level ID in t4
 	nop
 	
 ClearPlayerFlagsAndStatsInGP:		;put all game related flags here for clearing. This gets read at the main menu and resets them
@@ -364,6 +364,7 @@ ClearPlayerFlagsAndStatsInGP:		;put all game related flags here for clearing. Th
 	sw r0, orga(gDidQuickScoreScreensFlag) (gp)
 	lw at, orga(gPreviousBombs) (gp)
 	sw at, orga(gEnduranceModePreviousBombs) (gp)
+	sw r0, orga(gRandomDeathItemInGameFlag) (gp)
 	jr ra
 	nop
 	

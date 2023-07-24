@@ -8,7 +8,7 @@
 .region 0x8000	;No idea how to properly use all 64kb of global pointer space with this compiler, so it's limited to 32kb.
 
 GLOBAL_POINTER:		;top of global pointer
-.asciiz "2023-03-06 20:47:13"
+.asciiz "2023-07-24 16:47:27"
 .align 4,0
 
 gDebugModeFlag:		;enables a set of test features
@@ -145,7 +145,11 @@ gRandomItemDropsTable:		;item ids, leave -1 after last valid entry
 
 gRandomDeathItemFlag:
 .d32 0
+gRandomDeathItemInGameFlag:		;flag checks for in-game when on Venoms and tunnels. If set, stops randomizing on these levels
+.d32 0
 gRandomDeathItemCycle:
+.d32 0
+gRandomDeathItemCurrentItem:
 .d32 0
 gRandomDeathItemTable:
 
@@ -499,7 +503,7 @@ gRandomizerMenuColorTable:		;menu color table. leave 0 after last valid entry
 .d32 0
 
 gRandomizerPage1MaxOptions:
-.d32 9
+.d32 10
 gRandomizerPage2MaxOptions:
 .d32 0
 gRandomizerPage3MaxOptions:
