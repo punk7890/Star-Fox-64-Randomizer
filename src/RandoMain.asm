@@ -56,14 +56,21 @@ RandoLoop:		;get new table entry, exit if loaded 0
 	
 TBL_FUNC_InitLevelStartVars:		;stores player related info and global values when level begins when certain flags are set
 
-	jal CheckFoxState		;check if Fox is still in spawning in state
+	jal CheckFoxState		;check if Fox is in spawning, intro or alive state, if not end routine
 	li t7, 0x1
-	bne v0, t7, (NextTableEntry)
+	beq v0, t7, (@@ContinueChecks)
+	li t7, 0x2
+	beq v0, t7, (@@ContinueChecks)
+	li t7, 0x3
+	beq v0, t7, (@@ContinueChecks)
 	nop
+	j NextTableEntry
+	nop
+@@ContinueChecks:
 		lw v0, (LOC_ALIVE_TIMER32)		;check if second frame of entering level
 		li v1, 0x2
 		bne v0, v1, (NextTableEntry)
-			nop
+		nop
 			jal GetLevelID
 			nop
 			sw v0, orga(gPreviousLevel) (gp)
@@ -615,7 +622,7 @@ TBL_FUNC_RandomPlanets:		;randomizes at planet screen only, then chooses actual 
 					jal SeekToNewLevel
 					nop
 					lw at, orga(gAllowSamePlanetsFlag) (gp)
-					beq at, r0, (@@Continue3)
+					bne at, r0, (@@Continue3)
 					nop
 					jal CheckSameLevels
 					nop
@@ -625,7 +632,7 @@ TBL_FUNC_RandomPlanets:		;randomizes at planet screen only, then chooses actual 
 				jal SeekToNewLevel
 				nop
 				lw at, orga(gAllowSamePlanetsFlag) (gp)
-				beq at, r0, (@@Exit)
+				bne at, r0, (@@Exit)
 				nop
 				jal CheckSameLevels
 				nop
