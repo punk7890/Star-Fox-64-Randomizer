@@ -48,7 +48,7 @@ gEnablePlanetSelections:
 .d32 0
 
 gMarathonModeFlag:
-.d32 1
+.d32 0
 gMarathonModeAddToCompletedTimesFlag:
 .d32 0
 gMarathonModeSetPlanetActiveFlag:
