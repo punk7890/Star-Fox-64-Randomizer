@@ -1827,6 +1827,12 @@ TBL_FUNC_RandomColors:		;actively changes color of the map
 
 	lw at, orga(gRandomColorsActiveFlag) (gp)
 	beq at, r0, (NextTableEntry)
+	nop
+	jal GetLevelID
+	li t0, 0xD
+	beq t0, v0, (NextTableEntry)	;Zoness crashes on hardware for unknown reasons so skip
+	li t0, 0x8
+	beq t0, v0, (NextTableEntry)	;Aquas crashes on hardware for unknown reasons so skip
 	lui t0, 0x8017
 	lui t1, 0x8015
 	lw a0, (LOC_POWER_ON_TIMER32)
