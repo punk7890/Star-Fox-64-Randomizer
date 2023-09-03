@@ -365,6 +365,11 @@ ClearPlayerFlagsAndStatsInGP:		;put all game related flags here for clearing. Th
 	lw at, orga(gPreviousBombs) (gp)
 	sw at, orga(gEnduranceModePreviousBombs) (gp)
 	sw r0, orga(gRandomDeathItemInGameFlag) (gp)
+	sw r0, orga(gMarathonModeAddToCompletedTimesFlag) (gp)
+	sw r0, orga(gMarathonModeCompletedTimes) (gp)
+	sw r0, orga(gMarathonModeSetPlanetActiveFlag) (gp)
+	sw r0, orga(gWaitTimer) (gp)
+	sw r0, orga(gPlayerLivesNotEqualFlag)(gp)
 	jr ra
 	nop
 	
@@ -373,6 +378,12 @@ DoSoftReset:
 	/* Resets to a given screen. Call with a0. 1 = title screen, 3, main menu (won't work in most cases), 4 = map screen, 5 = gameover. Erases everything the player did in main game. */
 
 	;li a0, 0x4
+	lw at, LOC_FOX_POINTER32
+	beq at, r0, (@@SkipFoxCheck)
+	nop
+	sw r0, 0x01C8(at)	;fail safe for checks while in-game and using special states
+@@SkipFoxCheck:
+	sb r0, (LOC_HAS_CONTROL_FLAG8)	;set to zero for safety.
 	sw a0, (0x801578a0)
 	sh r0, (0x78a4) (at)
 	sb.u r0, (0x8016d6a0) ;clears Mission Completed screen if it's on-screen
@@ -383,9 +394,15 @@ DoSoftReset:
 DoSoftResetWithFlag:		;Same as above and sets gDidSoftReset to true
 
 	;li a0, 0x4
+	lw at, LOC_FOX_POINTER32
+	beq at, r0, (@@SkipFoxCheck)
+	nop
+	sw r0, 0x01C8(at)	;fail safe for checks while in-game and using special states
+@@SkipFoxCheck:
+	sb r0, (LOC_HAS_CONTROL_FLAG8)	;set to zero for safety.
 	sw a0, (0x801578a0)
 	sh r0, (0x78a4) (at)
-	sb r0, (0x8016d6a0) 
+	sb r0, (0x8016d6a0) ;clears Mission Completed screen if it's on-screen
 	li a0, 0x1
 	jr ra
 	sw a0, orga(gDidSoftReset) (gp)
@@ -587,7 +604,7 @@ PrintCursor:		;prints the cursor for menus based on gCursorStartingX and gCursor
 	mfc1 a2, f20
 	mfc1 a3, f20
 	li t8, CursorText
-	sw t8, 0x0010(sp)
+	sw t8, 0x0010(sp)	;why is this storing outside of stack space??? I can't remember.
 	lw a0, orga(gCursorStartingX) (gp)
 	jal @FUNC_RENDER_TEXT
 	lw a1, orga(gCursorStartingY) (gp)
