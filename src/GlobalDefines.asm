@@ -31,8 +31,9 @@
 	.definelabel LOC_CHECKPOINT_LEVEL_POS32, 0x8016DB20 ;position saved to checkpoint
 	.definelabel LOC_CHECKPOINT_SECTION_ID32, 0x8016DB10	;level section ID saved to checkpoint
 	.definelabel LOC_HAS_CONTROL_FLAG8, 0x8015789C ;does player have control flag. 1=yes, 0=no
-	.definelabel LOC_INTRO_OUTRO_TIMER32, 0x8016D8F0	;timer that counts up when fox states are 0x2 and 0x7
+	.definelabel LOC_INTRO_OUTRO_TIMER32, 0x8016D8F0	;timer that counts up when fox states are 0x2, 0x9 and 0x7
 	.definelabel LOC_ENDSCREEN_FLAG8, 0x8016D6A0
+	.definelabel LOC_KATINA_TIMER32, 0x801557a0 ;timer on katina. +0 minutes, +4 seconds, +8 milliseconds, +12 on state, +20 size (float)
 	
 	.definelabel LOC_MAP_DATA_POINTER32, 0x8016E180
 	
