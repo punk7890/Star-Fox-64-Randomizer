@@ -14,6 +14,7 @@ gRandoTable:	;always leave a zero after the last valid entry
 .d32 TBL_FUNC_InitLevelStartVars
 .d32 TBL_FUNC_InitLevelEndVarsHOOK
 .d32 TBL_FUNC_QuickScoreScreens
+.d32 TBL_FUNC_MarathonMode
 .d32 TBL_FUNC_ChoosePlanets
 .d32 TBL_FUNC_RandomPlanets
 .d32 TBL_FUNC_RandomItems
