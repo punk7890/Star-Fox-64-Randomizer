@@ -71,6 +71,7 @@ TBL_FUNC_InitLevelStartVars:		;stores player related info and global values when
 		li v1, 0x2
 		bne v0, v1, (NextTableEntry)
 		nop
+			sw r0, orga(gPlayerLivesNotEqualFlag)(gp)
 			jal GetLevelID
 			nop
 			sw v0, orga(gPreviousLevel) (gp)
