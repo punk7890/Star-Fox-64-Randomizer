@@ -5,7 +5,6 @@
 	@LOC_TRAININGMODE_RINGS32 equ 0x8016dcf0
 	
 	;MacBeth may need testing when quick score screens is on
-	;CheckPrevLivesAndResetCompletedTimes breaks random expert
 
 
 TBL_FUNC_MarathonMode:
@@ -226,10 +225,14 @@ TBL_FUNC_MarathonMode:
 	bne a0, v1, (@@Exit)	;check to see if Andross is in dying state
 	lh a0, 0x0002(t0)
 	li v1, 0x73
-	bne a0, v1, (@@Exit)	;if death timers aren't equal, exit
+	beq a0, v1, (@@SoftResetEnd)	;if death timers are equal, do soft reset
 	li v1, 0x72
-	bne a0, v1, (@@Exit)
+	beq a0, v1, (@@SoftResetEnd)
 	nop
+	j NextTableEntry
+	nop
+	
+@@SoftResetEnd:
 	jal DoSpecialState	;force freeze 
 	li a0, 3
 	li v0, 0x1
@@ -237,7 +240,7 @@ TBL_FUNC_MarathonMode:
 	lw a0, orga(gWaitTimer) (gp)
 	addiu a0, a0, 1
 	sw a0, orga(gWaitTimer) (gp)
-	li v1, 0x120
+	li v1, 0xB0
 	bne a0, v1, (@@Exit)	;wait x amount of time then do reset to map screen
 	nop
 	jal DoSoftResetWithFlag
