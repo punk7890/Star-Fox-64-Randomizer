@@ -8,7 +8,7 @@
 .region 0x8000	;No idea how to properly use all 64kb of global pointer space with this compiler, so it's limited to 32kb.
 
 GLOBAL_POINTER:		;top of global pointer
-.asciiz "2023-07-24 20:46:43"
+.asciiz "2023-09-03 04:07:06"
 .align 4,0
 
 gDebugModeFlag:		;enables a set of test features
@@ -48,6 +48,33 @@ gEnablePlanetSelections:
 .d32 0
 
 gMarathonModeFlag:
+.d32 1
+gMarathonModeAddToCompletedTimesFlag:
+.d32 0
+gMarathonModeSetPlanetActiveFlag:
+.d32 0
+gMarathonModeCompletedTimes:
+.d32 0
+gMarathonModeLevelList:
+.d8 0xA ;training
+.d8 0x0 ;corn
+.d8 0x1 ;met
+.d8 0xE ;fort
+.d8 0x2 ;SX
+.d8 0xC ;Titania
+.d8 0x11 ;Bolse
+.d8 0x6 ;VE1 
+.d8 0x10 ;Katina
+.d8 0x7 ;Solar
+.d8 0xB ;MacBeth
+.d8 0x5 ;SY
+.d8 0xD ;Aquas
+.d8 0x8 ;Zoness
+.d8 0x12 ;SZ
+.d8 0x3 ;A6
+.align 4,0xFF ;align end flag to 32 bit boundary
+
+gWaitTimer:		;used for special pause state (0x3 freeze game) to increment timer and use checks on. Only used for Marathon Mode at the moment.
 .d32 0
 
 gBossRushModeFlag:
@@ -242,6 +269,9 @@ gPreviousLevelList4:
 .d32 0xFFFFFFFF
 gPreviousLevelList8:
 .d32 0xFFFFFFFF
+
+gPlayerLivesNotEqualFlag:	;used for checks if player lives are not equal to gPreviousLives. Sets to true if not equal
+.d32 0
 
 gPreviousLives:
 .d32 2
