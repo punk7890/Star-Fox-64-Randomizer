@@ -11,33 +11,17 @@
 
 @@BeginRando:
 
-	addiu sp, sp, -0x64 	;On entry, save stuff to stack
-	sw ra, 0x0000(sp)
-	sw at, 0x0004(sp)
-	sw v0, 0x0008(sp)
-	sw v1, 0x000c(sp)
-	sw a0, 0x0010(sp)
-	sw a1, 0x0014(sp)
-	sw a2, 0x0018(sp)
-	sw a3, 0x001c(sp)
-	sw t0, 0x0020(sp)
-	sw t1, 0x0024(sp)
-	sw t2, 0x0028(sp)
-	sw t3, 0x002c(sp)
-	sw t4, 0x0030(sp)
-	sw t5, 0x0034(sp)
-	sw t6, 0x0038(sp)
-	sw t7, 0x003c(sp)
-	sw s0, 0x0040(sp)
-	sw s1, 0x0044(sp)
-	sw s2, 0x0048(sp)
-	sw s3, 0x004c(sp)
-	sw s4, 0x0050(sp)
-	sw s5, 0x0054(sp)
-	sw s6, 0x0058(sp)
-	sw s7, 0x005c(sp)
-	sw t8, 0x0060(sp)
-	sw t9, 0x0064(sp)
+	addiu sp, sp, -40 	;On entry, save stuff to stack
+	sw ra, 0(sp)
+	sw a0, 4(sp)
+	sw s0, 8(sp)
+	sw s1, 12(sp)
+	sw s2, 16(sp)
+	sw s3, 20(sp)
+	sw s4, 24(sp)
+	sw s5, 28(sp)
+	sw s6, 32(sp)
+	sw s7, 36(sp)
 	jal RandoSetups		;init useful values
 	nop
 	j RandoLoop 	;go and loop in the randomizer
@@ -2017,7 +2001,7 @@ TBL_FUNC_ExtraStarWolfs:	;puts star wolfs in Sector Z, Y, Katina, Andross 2 and 
 	b (NextTableEntry)
 	nop
 	
-@@OnSY:	;end scene
+@@OnSY:
 	jal CheckFoxState
 	li t1, 0x9
 	beql t1, v0, (@@ContinueSYChecks)	;if fox state entering all range mode, unset flag
@@ -2139,34 +2123,18 @@ NextTableEntry:		;store next entry and go back to loop
 
 ExitRandomizer:		;Restore stack, exit and continue regular game code
 
-	lw ra, 0x0000(sp)
-	lw at, 0x0004(sp)
-	lw v0, 0x0008(sp)
-	lw v1, 0x000c(sp)
-	lw a0, 0x0010(sp)
-	lw a1, 0x0014(sp)
-	lw a2, 0x0018(sp)
-	lw a3, 0x001c(sp)
-	lw t0, 0x0020(sp)
-	lw t1, 0x0024(sp)
-	lw t2, 0x0028(sp)
-	lw t3, 0x002c(sp)
-	lw t4, 0x0030(sp)
-	lw t5, 0x0034(sp)
-	lw t6, 0x0038(sp)
-	lw t7, 0x003c(sp)
-	lw s0, 0x0040(sp)
-	lw s1, 0x0044(sp)
-	lw s2, 0x0048(sp)
-	lw s3, 0x004c(sp)
-	lw s4, 0x0050(sp)
-	lw s5, 0x0054(sp)
-	lw s6, 0x0058(sp)
-	lw s7, 0x005c(sp)
-	lw t8, 0x0060(sp)
-	lw t9, 0x0064(sp)
+	lw ra, 0(sp)
+	lw a0, 4(sp)
+	lw s0, 8(sp)
+	lw s1, 12(sp)
+	lw s2, 16(sp)
+	lw s3, 20(sp)
+	lw s4, 24(sp)
+	lw s5, 28(sp)
+	lw s6, 32(sp)
+	lw s7, 36(sp)
 	jr ra
-	addiu sp, sp, 0x64
+	addiu sp, sp, 40
 	nop
 
 .endregion
