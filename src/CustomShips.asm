@@ -316,6 +316,69 @@ SpawnSingleStarWolf:	;pass a0 as the memory address to spawn in. a1 the craft ID
 	jr ra
 	addiu sp, sp, 0x0028	
 	nop
+	
+SpawnSingleStarWolfRegularMode:		;For Extra Star Wolfs. pass a0 as the memory address to spawn in. a1 the craft ID to target, a2 model.
+
+	addiu sp, sp, -48		
+	sw ra, 0x0024(sp)
+	sw a0, 0x0020(sp)
+	sw a1, 0x001C(sp)
+	sw a2, 0x0028(sp)
+	lw s0, 0x0020(sp)
+	jal	0x8005cf54		;clear craft space
+	or a0, s0, r0
+	lui s4, 0x4200
+	lui s1, 0x45AB
+	lui	s2, 0x450B	;y
+	lui	s3, 0xC53E
+	mtc1 s1, f4		;x
+	mtc1 s2, f6		;y
+	mtc1 s3, f7		;z
+	swc1 f4, 0x0004(s0)
+	swc1 f6, 0x0008(s0)
+	swc1 f7, 0x000C(s0)
+	li t6, 2	
+	sb t6, 0x0000(s0)		;state active	
+	li t7, 2		
+	sh t7, 0x00B8(s0)	;state of craft		
+	lw t8, 0x0028(sp)		
+	sh t8, 0x00E4(s0)		;craft model	
+	lw t9, 0x001C(sp)		
+	sh t9, 0x00E6(s0)		;craft to target
+	li t0, 0	
+	sh t0, 0x00B6(s0)		;toggles other models if craft model is 0xA +, other wise laser type	
+	li t1, 100		
+	sh t1, 0x00CE(s0)	;health	
+	li t2, 1		
+	sb t2, 0x0044(s0)	;ring drop
+	li t2, 1		
+	sw t2, 0x007C(s0)	;?		
+	li t3, 0		
+	sb t3, 0x00C9(s0)	;? 
+	li t4, 0x26	
+	sh t4, 0x00C2(s0)	;invulnerable timer	
+	li a1, 0xC5			;must be in a1 to pass to function (level specfic object ID. BE = missle, BF as well)
+	addiu a0, s0, 0x1C			;+0x1C of ship space in memory
+	jal	0x8005ce48		
+	sh	a1, 0x0002(s0)		
+	mtc1 r0, f8		
+	;li at, 0x8015DF48		;starting space	
+	li a3, 0x800c18b4	
+	li t5, 0x800c18bc		
+	sw s4, 0x0038(s0)	;can be targeted		
+	;lui	at, 0x8016			
+	li a0, 0x31004006	;engine sound	
+	addiu a1, s0, 0x100	;+0x100 of starting space
+	li t0, 3
+	sb t0, 0x003C(s0)		;hits when killed	
+	sw t5, 0x0014(sp)		
+	sw a3, 0x0010(sp)		
+	jal	0x80019218	;set engine sound
+	li a2, 4
+	lw ra, 0x0024(sp)				
+	jr ra
+	addiu sp, sp, +48	
+	nop
 
 SpawnSingleCraft:	;pass a0 as the memory address to spawn in. a1 the craft ID to target. a2 item to drop. Basic enemy craft
 
