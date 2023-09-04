@@ -1917,6 +1917,218 @@ TBL_FUNC_RandomColors:		;actively changes color of the map
 	; sw r0, 0x0b80(v1)
 	; nop
 	
+TBL_FUNC_ExtraStarWolfs:	;puts star wolfs in Sector Z, Y, Katina, Andross 2 and Bolse
+
+	;todo if expert mode, spawn more?
+
+	lw at, orga(gExtraStarWolfsFlag) (gp)
+	beq at, r0, (@@MainMenuCheck)
+	li v1, 1
+	sw.u v1, (0x8016DB40)
+	sw.l v1, (0x8016DB40)	;set wolf team flags to spawnable for game code
+	sw.l v1, (0x8016DB44)
+	sw.l v1, (0x8016DB48)
+	sw.l v1, (0x8016DB4c)
+	jal CheckMapScreenState
+	li v1, 3
+	beq v1, v0, (@@InMapScreen)
+	li v1, 5
+	beq v1, v0, (@@InMapScreen)
+	nop
+	lw a0, (LOC_ALIVE_TIMER32)
+	li v1, 0x2
+	beql a0, v1, (@@LevelChecks)
+	sw r0, orga(gWolfsSpawnedFlag) (gp)	;reset flag if alive timer is 2. Fail safe for entering level and retrying / dead
+@@LevelChecks:
+	jal GetLevelID
+	li v1, 0x12
+	beq v1, v0, (@@OnSZ)
+	li v1, 0x5
+	beq v1, v0, (@@OnSY)
+	li v1, 0x10
+	beq v1, v0, (@@OnKatina)
+	li v1, 0x9
+	beq v1, v0, (@@OnTunnel)
+	nop
+	b (NextTableEntry)
+	nop
+	
+@@InMapScreen:
+	li v0, 0x15210049
+	sw v0, (0x8002e858)	;restore op code
+	sw r0, orga(gWolfsSpawnedFlag) (gp)
+	li t0, 0x800C6A64	;sy assets
+	li v0, 0x0093C0E0	;wolf assets from ROM pointer
+	li v1, 0x00950880	;wolf assets from ROM end pointer
+	sw v0, 0x0090(t0)	;store ROM entry in Star Wolf specific level data
+	sw v1, 0x0094(t0)	;store ROM end entry in Star Wolf specific level data
+	li t0, 0x800C66D4	;sz assets
+	sw v0, 0x0090(t0)
+	sw v1, 0x0094(t0)
+	li t0, 0x800C6CC4	;tunnel assets
+	sw v0, 0x0090(t0)
+	b (NextTableEntry)
+	sw v1, 0x0094(t0)
+	nop
+
+@@OnSZ:
+	lw at, orga(gWolfsSpawnedFlag) (gp)
+	beq at, r0, (@@SZNotSpawned)
+	nop
+	li t0, 0x8015AD14	;wolf 1 spot is targeting Falco
+	li t1, 0x8015B008	;wolf 2 spot is targeting Slippy
+	lui at, 0x8017
+	lw a0, (0xD724) (at)	;grab Falco's health
+	lw a1, (0xD728) (at)	;grab Slippy's health
+	;lw a2, (0xD72C) (at)	;grab Peppy's health
+	beq a0, r0, (@@SZFalcoDead)
+	nop
+	beq a1, r0, (@@SZSlippyDead)
+	nop
+	b (NextTableEntry)
+	nop
+	
+@@SZFalcoDead:
+	sh r0, (0x00E6) (t0)	;Change target of wolf enemy that was targetting Falco to Fox
+	beq a1, r0, (@@SlippyDead)
+	nop
+	b (NextTableEntry)
+	nop
+@@SZSlippyDead:
+	sh r0, (0x00E6) (t1)	;Change target of wolf enemy that was targetting Slippy to Fox
+	b (NextTableEntry)
+	nop
+	
+@@SZNotSpawned:
+	lw a0, (0x80155798)	;get first missile timer
+	li v0, 0x07F0
+	bne v0, a0, (NextTableEntry)
+	li v0, 1
+	sw v0, orga(gWolfsSpawnedFlag) (gp)
+	sw r0, (0x8002e858)	;remove branch in game code so wolf team can shoot
+	li a0, 0x8015AD14
+	li a1, 1
+	jal SpawnSingleStarWolfRegularMode
+	li a2, 5
+	li a0, 0x8015B008
+	li a1, 2
+	jal SpawnSingleStarWolfRegularMode
+	li a2, 6
+	b (NextTableEntry)
+	nop
+	
+@@OnSY:	;end scene
+	jal CheckFoxState
+	li t1, 0x9
+	beql t1, v0, (@@ContinueSYChecks)	;if fox state entering all range mode, unset flag
+	sw r0, orga(gWolfsSpawnedFlag) (gp)
+	
+@@ContinueSYChecks:
+	lw at, orga(gWolfsSpawnedFlag) (gp)
+	beq at, r0, (@@SYNotSpawned)
+	nop
+	li t0, 0x8015AD14	;wolf 1 spot is targeting Falco
+	li t1, 0x8015B008	;wolf 2 spot is targeting Slippy
+	lui at, 0x8017
+	lw a0, (0xD724) (at)	;grab Falco's health
+	lw a1, (0xD728) (at)	;grab Slippy's health
+	;lw a2, (0xD72C) (at)	;grab Peppy's health
+	beq a0, r0, (@@FalcoDead)
+	nop
+	beq a1, r0, (@@SlippyDead)
+	nop
+	b (NextTableEntry)
+	nop
+	
+@@FalcoDead:
+	sh r0, (0x00E6) (t0)	;Change target of wolf enemy that was targetting Falco to Fox
+	beq a1, r0, (@@SlippyDead)
+	nop
+	b (NextTableEntry)
+	nop
+@@SlippyDead:
+	sh r0, (0x00E6) (t1)	;Change target of wolf enemy that was targetting Slippy to Fox
+	b (NextTableEntry)
+	nop
+	
+	
+@@SYNotSpawned:
+	li v0, 0x0200013A
+	lui at, 0x8016
+	lw a0, (0x5388) (at)	;check if one of the first two robots is alive
+	bne v0, a0, (NextTableEntry)	;if not active, end
+	li v0, 0x001D
+	lh a0, (0x53D4) (at)
+	bne v0, a0, (NextTableEntry)	;if not active state, end
+	li v0, 1
+	sw v0, orga(gWolfsSpawnedFlag) (gp)
+	sw r0, (0x8002e858)	;remove branch in game code so wolf team can shoot
+	li a0, 0x8015AD14
+	li a1, 1
+	jal SpawnSingleStarWolfRegularMode
+	li a2, 5
+	li a0, 0x8015B008
+	li a1, 2
+	jal SpawnSingleStarWolfRegularMode
+	li a2, 6
+	b (NextTableEntry)
+	nop
+	
+	
+@@OnKatina:
+	lh a0, (0x80165430)
+	li v0, 0x1670
+	bne a0, v0, (NextTableEntry)	;end if UFO timer is not equal
+	nop
+	jal 0x8002af70	;spawn wolf team from game code
+	nop
+	b (NextTableEntry)
+	nop
+	
+@@OnTunnel:
+	lui at, 0x8016
+	lw a0, (0x4F80) (at)
+	li v0, 0x02000141
+	bne a0, v0, (NextTableEntry)	;if AND2 not spawned, end
+	lh a0, (0x5012) (at)
+	li v0, 0x52
+	bne a0, v0, (NextTableEntry)	;activate star wolf if AND2 is 52 frames from becoming active
+	; li v0, 1
+	; sw v0, orga(gWolfsSpawnedFlag) (gp)	;not needed for this level
+	sw r0, (0x8002e858)	;remove branch in game code so wolf team can shoot
+	li a0, 0x8015AD14
+	li a1, 0
+	jal SpawnSingleStarWolfRegularMode
+	li a2, 4
+	li a0, 0x8015B008
+	li a1, 0
+	jal SpawnSingleStarWolfRegularMode
+	li a2, 7
+	b (NextTableEntry)
+	nop
+
+@@MainMenuCheck:
+	jal CheckIfMainMenu
+	li t0, 0x3E8
+	beq t0, v0, (@@ResetROMentry)
+	nop
+	b (NextTableEntry)
+	nop
+	
+
+@@ResetROMentry:	;resets star wolf assets to load on levels that don't normally have them.
+	li t0, 0x800C6A64	;sy assets
+	sw r0, 0x0090(t0)
+	sw r0, 0x0094(t0)
+	li t0, 0x800C66D4	;sz assets
+	sw r0, 0x0090(t0)
+	sw r0, 0x0094(t0)
+	li t0, 0x800C6CC4	;tunnel assets
+	sw r0, 0x0090(t0)
+	sw r0, 0x0094(t0)
+	b (NextTableEntry)
+	nop
+	
 NextTableEntry:		;store next entry and go back to loop
 
 	lw v0, orga(gRandoSeekEntry) (gp)
