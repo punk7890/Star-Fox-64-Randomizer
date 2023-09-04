@@ -1990,7 +1990,7 @@ TBL_FUNC_ExtraStarWolfs:	;puts star wolfs in Sector Z, Y, Katina, Andross 2 and 
 	
 @@SZFalcoDead:
 	sh r0, (0x00E6) (t0)	;Change target of wolf enemy that was targetting Falco to Fox
-	beq a1, r0, (@@SlippyDead)
+	beq a1, r0, (@@SZSlippyDead)
 	nop
 	b (NextTableEntry)
 	nop
