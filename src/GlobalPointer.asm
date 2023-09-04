@@ -8,7 +8,7 @@
 .region 0x8000	;No idea how to properly use all 64kb of global pointer space with this compiler, so it's limited to 32kb.
 
 GLOBAL_POINTER:		;top of global pointer
-.asciiz "2023-09-03 04:07:06"
+.asciiz "2023-09-04 02:56:00"
 .align 4,0
 
 gDebugModeFlag:		;enables a set of test features
@@ -75,6 +75,11 @@ gMarathonModeLevelList:
 .align 4,0xFF ;align end flag to 32 bit boundary
 
 gWaitTimer:		;used for special pause state (0x3 freeze game) to increment timer and use checks on. Only used for Marathon Mode at the moment.
+.d32 0
+
+gExtraStarWolfsFlag:
+.d32 0
+gWolfsSpawnedFlag:	;used to check if randomizer logic spawned wolf group. Unsets in end scene.
 .d32 0
 
 gBossRushModeFlag:
