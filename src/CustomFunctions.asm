@@ -370,6 +370,7 @@ ClearPlayerFlagsAndStatsInGP:		;put all game related flags here for clearing. Th
 	sw r0, orga(gMarathonModeSetPlanetActiveFlag) (gp)
 	sw r0, orga(gWaitTimer) (gp)
 	sw r0, orga(gPlayerLivesNotEqualFlag)(gp)
+	sw r0, orga(gWolfsSpawnedFlag) (gp)
 	jr ra
 	nop
 	
