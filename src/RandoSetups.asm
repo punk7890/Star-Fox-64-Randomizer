@@ -48,7 +48,7 @@ RandoSetups:
 		sw v0, 0xAD14(at)	;Protect the Targets mode restores
 		li at, 0x8002e858
 		li v0, 0x15210049
-		sw v0, 0x0000(at)	;Protect the Targets mode restores
+		sw v0, 0x0000(at)	;Protect the Targets mode restores and extra star wolfs
 		li at, 0x800AD69F	;Protect the Targets mode restores
 		li v1, 2
 		sb v1, 0x0000(at)	;Protect the Targets mode restores
