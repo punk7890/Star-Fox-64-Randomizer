@@ -1965,9 +1965,14 @@ TBL_FUNC_ExtraStarWolfs:	;puts star wolfs in Sector Z, Y, Katina, Andross 2 and 
 	lw a0, (0xD724) (at)	;grab Falco's health
 	lw a1, (0xD728) (at)	;grab Slippy's health
 	;lw a2, (0xD72C) (at)	;grab Peppy's health
+	li v0, -1
 	beq a0, r0, (@@SZFalcoDead)
 	nop
 	beq a1, r0, (@@SZSlippyDead)
+	nop
+	beq a0, v0, (@@SZFalcoDead)
+	nop
+	beq a1, v0, (@@SZSlippyDead)
 	nop
 	b (NextTableEntry)
 	nop
@@ -2017,9 +2022,14 @@ TBL_FUNC_ExtraStarWolfs:	;puts star wolfs in Sector Z, Y, Katina, Andross 2 and 
 	lw a0, (0xD724) (at)	;grab Falco's health
 	lw a1, (0xD728) (at)	;grab Slippy's health
 	;lw a2, (0xD72C) (at)	;grab Peppy's health
+	li v0, -1
 	beq a0, r0, (@@FalcoDead)
 	nop
 	beq a1, r0, (@@SlippyDead)
+	nop
+	beq a0, v0, (@@FalcoDead)
+	nop
+	beq a1, v0, (@@SlippyDead)
 	nop
 	b (NextTableEntry)
 	nop
