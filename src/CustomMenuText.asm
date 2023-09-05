@@ -133,6 +133,14 @@ EnduranceModeText:
 .asciiz "ENDURANCE MODE"
 .align 4,0
 
+MarathonModeText:
+.asciiz "MARATHON MODE"
+.align 4,0
+
+ExtraStarWolfsText:
+.asciiz "EXTRA STAR WOLFS"
+.align 4,0
+
 EnduranceModeLevelTimerText:
 .asciiz "LEVEL TIME"
 .align 4,0
