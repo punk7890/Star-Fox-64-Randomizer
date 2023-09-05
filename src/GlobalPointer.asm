@@ -8,7 +8,7 @@
 .region 0x8000	;No idea how to properly use all 64kb of global pointer space with this compiler, so it's limited to 32kb.
 
 GLOBAL_POINTER:		;top of global pointer
-.asciiz "2023-09-04 02:56:00"
+.asciiz "2023-09-04 17:40:53"
 .align 4,0
 
 gDebugModeFlag:		;enables a set of test features
@@ -542,9 +542,9 @@ gRandomizerPage1MaxOptions:
 gRandomizerPage2MaxOptions:
 .d32 0
 gRandomizerPage3MaxOptions:
-.d32 2
+.d32 3
 gRandomizerPage4MaxOptions:
-.d32 6
+.d32 7
 gMenuCursorValue:		;randomizer menu cursor value
 .d32 0
 gCursorStartingDefaultX:		;default X pos
