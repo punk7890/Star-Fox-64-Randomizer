@@ -29,6 +29,7 @@ gRandoTable:	;always leave a zero after the last valid entry
 .d32 TBL_FUNC_RandomColors
 .d32 TBL_FUNC_EnduranceMode
 .d32 TBL_FUNC_ProtectTheTargetsMode
+.d32 TBL_FUNC_ExtraStarWolfs
 .d32 0
 
 
