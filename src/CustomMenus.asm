@@ -735,6 +735,22 @@ SpecialModesPage1:
 	li a0, @CENTER_A0
 	jal @FUNC_RENDER_TEXT
 	li a1, @CENTER_MENU_ITEM_2_A1
+	li s6, @G_SETPRIMCOLOR		;menu option 2 start
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	lw t7, orga(gUserMenuColorValue) (gp)
+	sw t7, 0x0004(s0)
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, MarathonModeText
+	sw t8, 0x0010(sp)
+	li a0, @CENTER_A0
+	jal @FUNC_RENDER_TEXT
+	li a1, @CENTER_MENU_ITEM_3_A1
 	lw a0, orga(gMenuCursorValue) (gp)
 	lw a1, orga(gRandomizerPage3MaxOptions) (gp)
 	sltu v0, a0, a1
@@ -776,7 +792,7 @@ SpecialModesPage1:
 	jal PlaySFX
 	li.l a0, SFX_MOVE_CURSOR
 	lw a0, orga(gMenuCursorValue) (gp)
-	lw a1, orga(gRandomizerPage1MaxOptions) (gp)
+	lw a1, orga(gRandomizerPage3MaxOptions) (gp)
 	sltu v0, a0, a1
 	bne v0, r0, (@@CheckMenuOptionStates)	;reset cursor based on max options in page
 	nop
@@ -800,8 +816,8 @@ SpecialModesPage1:
 	beq a0, v0, (@@RandomOptionsPage3Option0)
 	li v0, 1
 	beq a0, v0, (@@RandomOptionsPage3Option1)
-	; li v0, 2
-	; beq a0, v0, (@@RandomOptionsPage1Option2)
+	li v0, 2
+	beq a0, v0, (@@RandomOptionsPage3Option2)
 	; li v0, 3
 	; beq a0, v0, (@@RandomOptionsPage1Option3)
 	; li v0, 4
@@ -824,7 +840,7 @@ SpecialModesPage1:
 	b (@@RenderOnOffText)
 	nop
 @@RandomOptionsPage3Option0:
-	; sw r0, orga(gMarathonModeFlag) (gp)
+	sw r0, orga(gMarathonModeFlag) (gp)
 	sw r0, orga(gBossRushModeFlag) (gp)
 	sw r0, orga(gProtectTheTargetsModeFlag) (gp)	;make conditional for this later
 	lw a0, orga(gEnduranceModeFlag) (gp)
@@ -841,6 +857,16 @@ SpecialModesPage1:
 	xori a0, a0, 1
 	b (@@RenderOnOffText)
 	sw a0, orga(gProtectTheTargetsModeFlag) (gp)
+	nop
+@@RandomOptionsPage3Option2:
+	sw r0, orga(gRandomPlanetsFlag) (gp)
+	sw r0, orga(gProtectTheTargetsModeFlag) (gp)	;;make conditional for this later
+	sw r0, orga(gBossRushModeFlag) (gp)
+	;sw r0, orga(gEnduranceModeFlag) (gp)
+	lw a0, orga(gMarathonModeFlag) (gp)
+	xori a0, a0, 1
+	b (@@RenderOnOffText)
+	sw a0, orga(gMarathonModeFlag) (gp)
 	nop
 	
 @@RenderOnOffText:
@@ -860,6 +886,15 @@ SpecialModesPage1:
 		li a1, @CENTER_MENU_ITEM_2_A1
 		jal PrintOnOffText
 		sw a1, orga(gYposToRender) (gp)
+		
+		li v0, gMarathonModeFlag
+		sw v0, orga(gOnOffLocationToRender) (gp)
+		li a0, @CENTER_MENU_ITEM_OFF_A0
+		sw a0, orga(gXposToRender) (gp)
+		li a1, @CENTER_MENU_ITEM_3_A1
+		jal PrintOnOffText
+		sw a1, orga(gYposToRender) (gp)
+
 		b (ExitRandomizerMenu)
 		nop
 		
@@ -992,6 +1027,22 @@ RandomMiscPage1:
 	li a0, @CENTER_A0
 	jal @FUNC_RENDER_TEXT
 	li a1, @CENTER_MENU_ITEM_6_A1
+	li s6, @G_SETPRIMCOLOR		;menu option 7 start
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	lw t7, orga(gUserMenuColorValue) (gp)
+	sw t7, 0x0004(s0)
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, ExtraStarWolfsText
+	sw t8, 0x0010(sp)
+	li a0, @CENTER_A0
+	jal @FUNC_RENDER_TEXT
+	li a1, @CENTER_MENU_ITEM_7_A1
 	lw a0, orga(gMenuCursorValue) (gp)
 	lw a1, orga(gRandomizerPage4MaxOptions) (gp)
 	sltu v0, a0, a1
@@ -1065,18 +1116,18 @@ RandomMiscPage1:
 	beq a0, v0, (@@RandomOptionsPage4Option4)
 	li v0, 5
 	beq a0, v0, (@@RandomOptionsPage4Option5)
-	; li v0, 6
-	; beq a0, v0, (@@RandomOptionsPage1Option6)
+	li v0, 6
+	beq a0, v0, (@@RandomOptionsPage4Option6)
 	; li v0, 7
-	; beq a0, v0, (@@RandomOptionsPage1Option7)
+	; beq a0, v0, (@@RandomOptionsPage4Option7)
 	; li v0, 8
-	; beq a0, v0, (@@RandomOptionsPage1Option8)
+	; beq a0, v0, (@@RandomOptionsPage4Option8)
 	; li v0, 9
-	; beq a0, v0, (@@RandomOptionsPage1Option9)
+	; beq a0, v0, (@@RandomOptionsPage4Option9)
 	; li v0, 10
-	; beq a0, v0, (@@RandomOptionsPage1Option10)
+	; beq a0, v0, (@@RandomOptionsPage4Option10)
 	; li v0, 11
-	; beq a0, v0, (@@RandomOptionsPage1Option11)
+	; beq a0, v0, (@@RandomOptionsPage4Option11)
 	nop
 	b (@@RenderOnOffText)
 	nop
@@ -1126,6 +1177,12 @@ RandomMiscPage1:
 	b (@@RenderOnOffText)
 	sw a0, orga(gQuickScoreScreensFlag) (gp)
 	nop
+@@RandomOptionsPage4Option6:
+	lw a0, orga(gExtraStarWolfsFlag) (gp)
+	xori a0, a0, 1
+	b (@@RenderOnOffText)
+	sw a0, orga(gExtraStarWolfsFlag) (gp)
+	nop
 	
 @@RenderOnOffText:
 
@@ -1174,6 +1231,14 @@ RandomMiscPage1:
 		li a0, @CENTER_MENU_ITEM_OFF_A0
 		sw a0, orga(gXposToRender) (gp)
 		li a1, @CENTER_MENU_ITEM_6_A1
+		jal PrintOnOffText
+		sw a1, orga(gYposToRender) (gp)
+		
+		li v0, gExtraStarWolfsFlag
+		sw v0, orga(gOnOffLocationToRender) (gp)
+		li a0, @CENTER_MENU_ITEM_OFF_A0
+		sw a0, orga(gXposToRender) (gp)
+		li a1, @CENTER_MENU_ITEM_7_A1
 		jal PrintOnOffText
 		sw a1, orga(gYposToRender) (gp)
 		
