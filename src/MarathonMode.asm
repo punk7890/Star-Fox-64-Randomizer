@@ -291,7 +291,7 @@ TBL_FUNC_MarathonMode:
 	addiu a0, a0, -1
 	sw a0, orga(gMarathonModeCompletedTimes) (gp)
 	li v0, 1
-	sw v0, orga(gPlayerLivesNotEqualFlag)(gp)
+	sw v0, orga(gPlayerLivesNotEqualFlag)(gp)	;Unsets in TBL_FUNC_InitLevelStartVars
 @@End:
 	jr ra
 	nop
