@@ -56,6 +56,7 @@ TBL_FUNC_InitLevelStartVars:		;stores player related info and global values when
 		bne v0, v1, (NextTableEntry)
 		nop
 			sw r0, orga(gPlayerLivesNotEqualFlag)(gp)
+			sw r0, orga(gPlayerLivesNotEqualFlagBRM) (gp)
 			jal GetLevelID
 			nop
 			sw v0, orga(gPreviousLevel) (gp)
@@ -112,7 +113,7 @@ SUB_CustomEndScreenHook:	;level end screen custom function. Runs once (twice?) w
 	beq a2, r0, (@@SkipBRMCheck)	;skip some boss rush mode exclusive value stores
 	sll a1, v0, 2
 	addu a1, at, a1
-	lw a2, orga(gBRMTimerScoreToDisplay) (gp)
+	lw a2, orga(gTimerScoreToDisplay) (gp)
 	lui a3, 0x8015
 	addu a2, a2, a3
 	sw a2, 0xd9e0(a1)	;don't remember, some score related thing? Planet score?
