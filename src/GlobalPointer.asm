@@ -82,9 +82,6 @@ gExtraStarWolfsFlag:
 gWolfsSpawnedFlag:	;used to check if randomizer logic spawned wolf group. Unsets in end scene.
 .d32 0
 
-gBossRushModeFlag:
-.d32 0
-
 gUnlockAllMedalsAndExpertFlag:		;unlocks medals and expert. turn off in menu then erase save data for a regular game.
 .d32 1
 
@@ -237,8 +234,52 @@ gCrashHandlerHookCreated:		;force crash handler screen if game crashed flag
 gEndScreenHookCreated:
 .d32 0
 
-gBRMTimerScoreToDisplay:		;old import
+gBossRushModeFlag:
 .d32 0
+gPlayerLivesNotEqualFlagBRM:
+.d32 0
+gBRMAddToCompletedTimesFlag:
+.d32 0
+gBRMAddToCompletedTimes:
+.d32 0
+gTimerActive:
+.d32 0
+gTimerScore:
+.d32 0
+gTimerFinalScore:
+.d32 0
+gTimerScoreToDisplay:
+.d32 0
+gLastTimerVenoms:
+.d32 0
+gTunnels2IsDoneFlag:
+.d32 0
+gBRMVenom1TimeMARATHON:
+.d32 30000
+gBRMVenom1TimeREGULAR:
+.d32 18000
+gCornFlag:	;0 = Mech all range boss, 1 = ship boss
+.d32 0
+gBRMLevelList:	;if MA mode is on
+.d8 0xA ;training if MA mode is on
+.d8 0x0 ;corn
+.d8 0x1 ;met
+.d8 0xE ;fort
+.d8 0x2 ;SX
+.d8 0xC ;Titania
+.d8 0x11 ;Bolse
+.d8 0x6 ;VE1 
+.d8 0x0 ;corn
+.d8 0x10 ;Katina
+.d8 0x7 ;Solar
+.d8 0xB ;MacBeth
+.d8 0x5 ;SY
+.d8 0xD ;Aquas
+.d8 0x8 ;Zoness
+.d8 0x12 ;SZ
+.d8 0x3 ;A6
+.d8 0xFF
+.align 4,0xFF
 
 ; gMaxLevelList:
 ; .d32 12
