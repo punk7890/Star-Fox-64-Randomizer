@@ -17,6 +17,7 @@
 	.definelabel LOC_SPECIAL_STATE, 0x8016D6C4 	;0x1 = reset level or restart at checkpoint (crashes on hardware), 0x2 resume, 0x3 softlock (set to 0x2 to resume), 0x64 pause
 	.definelabel LOC_POWER_ON_TIMER32, 0x800C18C0		;a simple incremental timer since power on
 	.definelabel LOC_ALIVE_TIMER32, 0x8016dc20 			;incremental timer since player spawned. resets if died.
+	.definelabel LOC_ALLRANGEMODE_TIMER, 0x80155798 	;all range mode active timer
 	.definelabel LOC_NUM_PLANETS_COMPLETED32, 0x8016d9b8	;num planets completed by game code, randomizer completed times will be elsewhere
 	.definelabel LOC_EXPERT_FLAG32, 0x8016d868	;flag for expert mode. 1 if on.
 	.definelabel LOC_SUB_SECTION_FLAG32, 0x8016e0ec 	;flag that determines sub section of level, like warps and tunnel 2
@@ -27,6 +28,7 @@
 	.definelabel LOC_PLAYER_HITS32, 0x80157908	;current level hits
 	.definelabel LOC_PLAYER_TOTAL_HITS32, 0x80157584
 	.definelabel LOC_LEVEL_SECTION_ID32, 0x8016DC38 ;current section of the level
+	.definelabel LOC_CHECKPOINT_ALLRANGEMODE_FLAG, 0x80155794 ;sets flag if checkpoint reached in all range mode levels
 	.definelabel LOC_CHECKPOINT_HITS32, 0x8015790C ;location that saved your current level hits after collecting a checkpoint
 	.definelabel LOC_CHECKPOINT_LEVEL_POS32, 0x8016DB20 ;position saved to checkpoint
 	.definelabel LOC_CHECKPOINT_SECTION_ID32, 0x8016DB10	;level section ID saved to checkpoint
