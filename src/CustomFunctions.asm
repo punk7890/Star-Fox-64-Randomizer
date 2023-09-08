@@ -277,18 +277,29 @@ OrderPlanets:		;orders planets in planet screen based on the last completed plan
 	jr ra
 	nop
 	
-CheckFoxState:	;returns a valid state in v0, otherwise returns 0xFFFFFFFF.
+CheckFoxState:	;returns a valid state in v0, otherwise returns -1.
 
 	lw t0, (LOC_FOX_POINTER32)
 	beq t0, r0, (@@End)
-	li v0, 0xFFFFFFFF
+	li v0, -1
 		lw v0, 0x01C8(t0)
 		sltiu v1, v0, 0x000E
 		beql v1, r0, (@@End)
-		li v0, 0xFFFFFFFF
+		li v0, -1
 @@End:
 			jr ra
 			nop
+			
+CheckFoxState2:		;returns state in v0. Pass memory address based on Fox pointer to check in a0 (16 bit).
+
+	lw t0, (LOC_FOX_POINTER32)
+	beq t0, r0, (@@End)
+	li v0, -1
+		addu a0, t0, a0
+		lw v0, 0x0000(t0)
+@@End:
+		jr ra
+		nop
 			
 SetFoxState:		;sets various Fox states. Pass 16bit address in a0, and value to write to location in a1 (32 bit store).
 
@@ -371,6 +382,11 @@ ClearPlayerFlagsAndStatsInGP:		;put all game related flags here for clearing. Th
 	sw r0, orga(gWaitTimer) (gp)
 	sw r0, orga(gPlayerLivesNotEqualFlag)(gp)
 	sw r0, orga(gWolfsSpawnedFlag) (gp)
+	sw r0, orga(gBRMAddToCompletedTimes) (gp)
+	sw r0, orga(gBRMAddToCompletedTimesFlag) (gp)
+	sw r0, orga(gTimerActive) (gp)
+	sw r0, orga(gTimerScoreToDisplay) (gp)
+	sw r0, orga(gTimerFinalScore) (gp)
 	jr ra
 	nop
 	
