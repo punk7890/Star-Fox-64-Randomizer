@@ -33,8 +33,11 @@
 	.definelabel LOC_CHECKPOINT_LEVEL_POS32, 0x8016DB20 ;position saved to checkpoint
 	.definelabel LOC_CHECKPOINT_SECTION_ID32, 0x8016DB10	;level section ID saved to checkpoint
 	.definelabel LOC_HAS_CONTROL_FLAG8, 0x8015789C ;does player have control flag. 1=yes, 0=no
+	.definelabel LOC_HAS_CONTROL_FLAG32, 0x80157690	;different from above, not perfect
 	.definelabel LOC_INTRO_OUTRO_TIMER32, 0x8016D8F0	;timer that counts up when fox states are 0x2, 0x9 and 0x7
 	.definelabel LOC_BOSS_ACTIVE_TIMER32, 0x80157210	;timer that counts up if level boss is active
+	.definelabel LOC_PAUSE_TIMER32, 0x801576A8		;incremental timer when in pause menu. Resets to zero on exit
+	.definelabel LOC_PAUSE_STATE32, 0x80157680		;State of pause screen. 0x1 = in pause menu, 0x2 just retried, 0x3 black screen with lives amount on-screen, 0x4 last phase before resuming
 	.definelabel LOC_ENDSCREEN_FLAG8, 0x8016D6A0
 	.definelabel LOC_KATINA_TIMER32, 0x801557a0 ;timer on katina. +0 minutes, +4 seconds, +8 milliseconds, +12 on state, +20 size (float)
 	
