@@ -360,7 +360,7 @@ LoadPlayerInfoAsArguments:		;loads player info from Global Pointer into temp reg
 	
 ClearPlayerFlagsAndStatsInGP:		;put all game related flags here for clearing. This gets read at the main menu and resets them
 
-	li t7, 0xFFFFFFFF
+	li t7, -1
 	sw t7, orga(gPreviousLevel) (gp)
 	sw t7, orga(gPreviousLevelList) (gp)
 	sw t7, orga(gPreviousLevelList4) (gp)
@@ -384,9 +384,15 @@ ClearPlayerFlagsAndStatsInGP:		;put all game related flags here for clearing. Th
 	sw r0, orga(gWolfsSpawnedFlag) (gp)
 	sw r0, orga(gBRMAddToCompletedTimes) (gp)
 	sw r0, orga(gBRMAddToCompletedTimesFlag) (gp)
+	sw r0, orga(gPlayerLivesNotEqualFlagBRM) (gp)
+	sw r0, orga(gTimerScore) (gp)
 	sw r0, orga(gTimerActive) (gp)
 	sw r0, orga(gTimerScoreToDisplay) (gp)
 	sw r0, orga(gTimerFinalScore) (gp)
+	sw r0, orga(gLastTimerVenoms) (gp)
+	sw r0, orga(gLastAND2Timer) (gp)
+	sw r0, orga(gTunnels2IsDoneFlag) (gp)
+	sw r0, orga(gCornFlag) (gp)
 	jr ra
 	nop
 	
