@@ -8,11 +8,11 @@
 .region 0x8000	;No idea how to properly use all 64kb of global pointer space with this compiler, so it's limited to 32kb.
 
 GLOBAL_POINTER:		;top of global pointer
-.asciiz "2023-09-04 17:40:53"
+.asciiz "2023-09-09 16:33:17"
 .align 4,0
 
 gDebugModeFlag:		;enables a set of test features
-.d32 0
+.d32 1
 
 gDebugModeFreezeFrameFlag:		
 .d32 0
@@ -252,16 +252,24 @@ gTimerScoreToDisplay:
 .d32 0
 gLastTimerVenoms:
 .d32 0
+gLastAND2Timer:
+.d32 0
 gTunnels2IsDoneFlag:
 .d32 0
 gBRMVenom1TimeMARATHON:
 .d32 30000
 gBRMVenom1TimeREGULAR:
 .d32 18000
+gBRMVenom2TimeREGULAR:
+.d32 20500
+gTimerScoreREGULAR:
+.d32 10000
+gBRMExportAddScore:
+.d32 200
 gCornFlag:	;0 = Mech all range boss, 1 = ship boss
 .d32 0
 gBRMLevelList:	;if MA mode is on
-.d8 0xA ;training if MA mode is on
+;.d8 0xA ;training if MA mode is on
 .d8 0x0 ;corn
 .d8 0x1 ;met
 .d8 0xE ;fort
@@ -583,7 +591,7 @@ gRandomizerPage1MaxOptions:
 gRandomizerPage2MaxOptions:
 .d32 0
 gRandomizerPage3MaxOptions:
-.d32 3
+.d32 4
 gRandomizerPage4MaxOptions:
 .d32 7
 gMenuCursorValue:		;randomizer menu cursor value
