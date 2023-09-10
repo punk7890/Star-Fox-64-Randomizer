@@ -6,14 +6,11 @@
 
 ;if MA mode on, in training stop timer from counting down and have more enemies on a 1 minute timer then end level
 ;make special training mode a bonus stage if passed x score?
-;put previous level in initlevelvars
-;there's some ending logic in SUB_CustomEndScreenHook already
+;put previous level in initlevelvars?
 ;soft reseting might not have BRM values to restore properly in LoadPlayerInfoToGame
-;make timer for Venom 2 regular
-;kill item function
-;put SZ stuff in timerchecks
+;kill item function?
 ;speed up missiles on SZ? check if all dead / alive?
-;MA mode goes to training bug
+;Timers on Venom 2 tunnels after AND2 brain is dead gets wrong timers if player died / retried. Leave as a penalty for dying?
 
 TBL_FUNC_BossRushMode:
 
@@ -178,13 +175,19 @@ TBL_FUNC_BossRushMode:
 	
 @@OnBOLSE:
 	li v0, 3
-	beq s1, v0, (@@BolseForceStageState)	;if regular state force shield down
+	bne s1, v0, (@@Exit)	;if not active, exit
+	lui t0, 0x8016
+	lh v1, 0x53D6(t0)	;check state of level
+	li v0, 2
+	beq v1, v0, (@@Exit)	;if shield state set to down, exit
+	nop
+	bne v1, v0, (@@BolseForceStageState)	;if regular states force shield down
 	nop
 	j NextTableEntry
 	nop
 @@BolseForceStageState:
 	li v0, 0x2
-	sw v0, (0x801653D6)
+	sh v0, 0x53D6(t0)
 @@BolseSpawnWolfFlags:
 	lw v0, orga(gExtraStarWolfsFlag) (gp)
 	bne v0, r0, (@@BolseForceCheckPoint)
@@ -233,6 +236,9 @@ TBL_FUNC_BossRushMode:
 	bne a0, r0, (@@Exit)
 	lw v0, orga(gMarathonModeFlag) (gp)
 	bne v0, r0, (@@OnVE2Marathon)	;don't store new timer since marathon mode isn't on
+	lw v0, orga(gPreviousLevel) (gp)
+	li v1, 0x6
+	beq v0, v1, (@@Exit)	;if previous level was VE1, don't store new score
 	lw a0, orga(gBRMVenom2TimeREGULAR) (gp)
 	sw a0, orga(gTimerScoreToDisplay) (gp)
 	j NextTableEntry
@@ -526,7 +532,7 @@ TBL_FUNC_BossRushMode:
 	jr ra
 	nop
 	
-@DoTimerChecks:		;do timer last stopped at logic for when stopping and resuming? store into prev stopped timer if stopped, store into active state again after?
+@DoTimerChecks:
 	lb v0, (LOC_ENDSCREEN_FLAG8)
 	bne v0, r0, (@@DoEndScreenCalcs)
 	addu v0, s1, v0
@@ -585,17 +591,21 @@ TBL_FUNC_BossRushMode:
 	nop
 @@OnTunnelsEndNotTunnels2:
 	lw v0, orga(gMarathonModeFlag) (gp)
-	beq v0, r0, (@@EndCalcs2)
+	beq v0, r0, (@@DoTunnels1Score)
 	li v0, 1
 	sw v0, orga(gTunnels2IsDoneFlag) (gp)
 	jr ra
 	;sw a3, orga(gTimerFinalScore) (gp)
 	nop
+@@DoTunnels1Score:	;player now finished the game without marathon mode
+	jr ra
+	sw a3, orga(gTimerFinalScore) (gp)
+	nop
 @@OnSurfaceEnd:
 	lw v0, orga(gTunnels2IsDoneFlag) (gp)
 	beq v0, r0, (@@NotDoneTunnels2)
 	nop
-	;sw a2, (LOC_PLAYER_TOTAL_HITS32) ;not needed?
+	sw a2, (LOC_PLAYER_TOTAL_HITS32)
 	sw a3, orga(gTimerFinalScore) (gp)
 	jr ra
 	nop
@@ -618,9 +628,9 @@ TBL_FUNC_BossRushMode:
 	beq v0, r0, (@@EndLogic)
 @@DeadStateChecks:
 	li v0, 0x4
-	beq s1, v0, (@@IsDead)	;checks for if dead or retrying
+	beq s1, v0, (@@IsDeadState4)	;checks for if dead or retrying
 	li v0, 0x0
-	beq s1, v0, (@@IsDead)
+	beq s1, v0, (@@IsDeadState0)
 	lw a0, orga(gTimerScoreToDisplay) (gp)
 	addiu a0, a0, -1
 	bltl a0, 0, (@@UnderflowStore)
@@ -629,7 +639,17 @@ TBL_FUNC_BossRushMode:
 	sw a0, orga(gTimerScoreToDisplay) (gp)
 	jr ra
 	nop
-@@IsDead:
+@@IsDeadState0:
+	sw r0, orga(gTimerActive) (gp)
+	lw a0, (LOC_HAS_CONTROL_FLAG32)	;check if game logic made Fox not render (used for cutscenes)
+	beq a0, r0, (@@EndLogic)
+	;resume since player manually retried (unsets if paused)
+	li v0, 0x9
+	beq s2, v0, (@@AndrossBrainDeadState1) ;player is in tunnels so store old score and set flag
+	nop
+	jr ra
+	nop
+@@IsDeadState4:
 	sw r0, orga(gTimerActive) (gp)
 	lui t0, 0x8016
 	li a0, 0x02000141
