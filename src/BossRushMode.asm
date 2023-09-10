@@ -1,5 +1,5 @@
 	
-	/* Boss Rush Mode logic function. Text display logic is in SUB_InGameText at BossRushModeTextDisplay */
+	/* Boss Rush Mode logic function. Text display logic is in SUB_InGameText at BossRushRenderText */
 
 .n64		
 .autoregion
@@ -13,19 +13,18 @@
 ;kill item function
 ;put SZ stuff in timerchecks
 ;speed up missiles on SZ? check if all dead / alive?
+;MA mode goes to training bug
 
 TBL_FUNC_BossRushMode:
 
 	lw at, orga(gBossRushModeFlag) (gp)
-	beq a0, r0, (@@Exit)
+	beq at, r0, (@@Exit)
 	la s0, LOC_PLAYER_TOTAL_HITS32	;load player score address to s0
 	jal GetLevelID
 	nop
 	or s2, v0, r0	;move level ID into s2
 	jal CheckMapScreenState
 	li v1, 3
-	beq v1, v0, (@@MapScreenStuff)
-	li v1, 5
 	beq v1, v0, (@@MapScreenStuff)
 	nop
 	jal CheckFoxState
@@ -35,6 +34,8 @@ TBL_FUNC_BossRushMode:
 	beq s1, v1, (@@Exit)
 	nop 
 	jal @DoTimerChecks
+	nop
+	jal @DoTimerLogic
 	nop
 	lb v0, (LOC_ENDSCREEN_FLAG8)
 	bne v0, r0, (@@EndSceneChecks)	;check if only end screen is displaying
@@ -98,7 +99,7 @@ TBL_FUNC_BossRushMode:
 	sh r0, 0xd19a (t0)	;Going off old code, I think this moves pos to 0
 	sh r0, 0xd19c (t0)
 	li v0, -1
-	sh r0, 0xd19c (t0)	;change 2nd level object to end data flag
+	sh v0, 0xd1b8 (t0)	;change 2nd level object to end data flag
 	li v0, 0x10000017
 	sw.u v0, (0x80181DAC) ;put branch in 2nd boss's function. I believe this removes some conditional checks
 	j NextTableEntry
@@ -230,11 +231,18 @@ TBL_FUNC_BossRushMode:
 @@OnVE2:
 	lw a0, (LOC_ALIVE_TIMER32)
 	bne a0, r0, (@@Exit)
+	lw v0, orga(gMarathonModeFlag) (gp)
+	bne v0, r0, (@@OnVE2Marathon)	;don't store new timer since marathon mode isn't on
+	lw a0, orga(gBRMVenom2TimeREGULAR) (gp)
+	sw a0, orga(gTimerScoreToDisplay) (gp)
+	j NextTableEntry
+	sw a0, orga(gLastTimerVenoms) (gp)
+	nop
+@@OnVE2Marathon:
 	lw a0, orga(gTimerScoreToDisplay) (gp)
 	j NextTableEntry
 	sw a0, orga(gLastTimerVenoms) (gp)
 	nop
-	
 @@OnKatina:
 	lw a0, (LOC_ALIVE_TIMER32)
 	bgt a0, 5, (@@Exit)
@@ -395,6 +403,8 @@ TBL_FUNC_BossRushMode:
 	beq s1, v0, (@@IfVE2)
 	li v0, 0xB
 	beq s1, v0, (@@IfMacBeth)
+	li v0, 0x3
+	beq s1, v0, (@@IfA6)
 	nop
 	j NextTableEntry
 	nop
@@ -437,6 +447,14 @@ TBL_FUNC_BossRushMode:
 	j NextTableEntry
 	sw v1, orga(gCornFlag) (gp)
 	nop
+@@IfA6:
+	lui at, 0x8018
+	li v0, 0x7
+	sh v0, 0x58EE(at)	;do soft reset to venom 1 by overwriting op codes in map logic, equivalent to calling DoSoftReset with a0 0x00060007
+	li v0, 0x6
+	j NextTableEntry
+	sh v0, 0x58FE(at)
+	nop
 	
 	
 	
@@ -449,7 +467,7 @@ TBL_FUNC_BossRushMode:
 @@MarathonNotOn:
 	sw r0, orga(gTimerActive) (gp)
 	;sw r0, orga(gBRMAddToCompletedTimesFlag) (gp)
-	lw a0, orga(gTimerScore) (gp)
+	lw a0, orga(gTimerScoreREGULAR) (gp)
 	sw a0, orga(gTimerScoreToDisplay) (gp)
 	lw a1, 0x0000(s0)	;total hits
 	sw a1, orga(gTimerFinalScore) (gp)
@@ -468,7 +486,7 @@ TBL_FUNC_BossRushMode:
 	lw v0, orga(gMarathonModeFlag) (gp)
 	beq v0, r0, (@@Exit)
 	nop
-	;put prevscore logic here and move marathon mode check
+	;put prevscore logic here and move marathon mode check -- doesn't this work already???
 	la t0, gBRMLevelList
 	lw a0, orga(gBRMAddToCompletedTimes) (gp)
 	addu t0, a0, t0
@@ -509,10 +527,152 @@ TBL_FUNC_BossRushMode:
 	nop
 	
 @DoTimerChecks:		;do timer last stopped at logic for when stopping and resuming? store into prev stopped timer if stopped, store into active state again after?
+	lb v0, (LOC_ENDSCREEN_FLAG8)
+	bne v0, r0, (@@DoEndScreenCalcs)
+	addu v0, s1, v0
+	li v1, 8
+	beq v0, v1, (@@DoEndScreenCalcs)
+	li v0, 7
+	beq s1, v0, (@@DoEndScreenCalcs)
+	lw v0, (LOC_HAS_CONTROL_FLAG32)
+	beq v0, r0, (@@StopTimer)
+	lb v0, (LOC_HAS_CONTROL_FLAG8)
+	beq v0, r0, (@@StopTimer)
+	lw v0, (LOC_SPECIAL_STATE)
+	li v1, 0x64
+	beq v0, v1, (@@StopTimer)
+	li v0, 1
+	sw v0, orga(gTimerActive) (gp)
+@@EndCalcs1:
 	jr ra
 	nop
-
+@@StopTimer:
+	jr ra
+	sw r0, orga(gTimerActive) (gp)
+	nop
 	
+@@DoEndScreenCalcs:
+	lw v0, orga(gTimerActive) (gp)
+	beq v0, r0, (@@EndCalcs2)
+	; lw v0, (LOC_EXPERT_FLAG32)
+	; bne v0, r0, (@@IsExpert)
+	lw v1, (LOC_PLAYER_HITS32)
+	lw a0, (LOC_PLAYER_TOTAL_HITS32)
+	lw a1, orga(gTimerScoreToDisplay) (gp)
+	sw a1, orga(gLastTimerVenoms) (gp)
+	addu a3, a0, v1
+	addu a3, a3, a1		;full totals in a3
+	addu a2, a0, a1 	;only add player total hits and boss timer score into a2 as level hits automatically get added by game logic
+	;sw a2, (LOC_PLAYER_TOTAL_HITS32)
+	sw r0, orga(gTimerActive) (gp)
+	li v0, 0x9
+	beq s2, v0, (@@OnTunnelsEnd)
+	li v0, 0x13
+	beq s2, v0, (@@OnSurfaceEnd)
+	nop
+	sw a2, (LOC_PLAYER_TOTAL_HITS32)
+	jr ra
+	sw a3, orga(gTimerFinalScore) (gp)
+	nop
+@@OnTunnelsEnd:
+	lw v0, (LOC_SUB_SECTION_FLAG32)
+	beq v0, r0, (@@OnTunnelsEndNotTunnels2)	;player not in ending state in tunnels 2
+	li v0, 1
+	sw v0, orga(gTunnels2IsDoneFlag) (gp)
+	;addu a3, a0, v1	;only add player hits and totals
+	jr ra
+	;sw a3, orga(gTimerFinalScore) (gp)
+	nop
+@@OnTunnelsEndNotTunnels2:
+	lw v0, orga(gMarathonModeFlag) (gp)
+	beq v0, r0, (@@EndCalcs2)
+	li v0, 1
+	sw v0, orga(gTunnels2IsDoneFlag) (gp)
+	jr ra
+	;sw a3, orga(gTimerFinalScore) (gp)
+	nop
+@@OnSurfaceEnd:
+	lw v0, orga(gTunnels2IsDoneFlag) (gp)
+	beq v0, r0, (@@NotDoneTunnels2)
+	nop
+	;sw a2, (LOC_PLAYER_TOTAL_HITS32) ;not needed?
+	sw a3, orga(gTimerFinalScore) (gp)
+	jr ra
+	nop
+@@NotDoneTunnels2:
+	; lw v0, orga(gMarathonModeFlag) (gp)
+	; bne v0, r0, (@@NotDoneTunnels2Marathon)
+	; nop
+	jr ra
+	;sw a2, orga(gTimerFinalScore) (gp)
+	nop
+; @@NotDoneTunnels2Marathon:
+	; jr ra
+	; nop
+@@EndCalcs2:
+	jr ra
+	nop
 	
+@DoTimerLogic:	;might not work for death state 0 for andross brain checks
+	lw v0, orga(gTimerActive) (gp)
+	beq v0, r0, (@@EndLogic)
+@@DeadStateChecks:
+	li v0, 0x4
+	beq s1, v0, (@@IsDead)	;checks for if dead or retrying
+	li v0, 0x0
+	beq s1, v0, (@@IsDead)
+	lw a0, orga(gTimerScoreToDisplay) (gp)
+	addiu a0, a0, -1
+	bltl a0, 0, (@@UnderflowStore)
+	or a0, r0, r0
+@@UnderflowStore:
+	sw a0, orga(gTimerScoreToDisplay) (gp)
+	jr ra
+	nop
+@@IsDead:
+	sw r0, orga(gTimerActive) (gp)
+	lui t0, 0x8016
+	li a0, 0x02000141
+	lw v0, 0x4F80(t0)	;check if andross brain is loaded in memory
+	beq v0, a0, (@@AndrossBrainChecks)
+	li v0, 0x13
+	beq s2, v0, (@@OnSurfaceDeadChecks)
+	lw a0, orga(gTimerScoreREGULAR) (gp)	;Andross 2 isn't in memory when player died, so get regular planet timer
+	jr ra
+	sw a0, orga(gTimerScoreToDisplay) (gp)
+	nop
+@@OnSurfaceDeadChecks:
+	lw v0, orga(gMarathonModeFlag) (gp)
+	beq v0, r0, (@@EndLogic)	;player doesn't have marathon mode on
+	lw a0, orga(gLastTimerVenoms) (gp)
+	jr ra
+	sw a0, orga(gTimerScoreToDisplay) (gp)
+	nop
+	
+@@AndrossBrainChecks:
+	li v1, 0x14
+	lh v0, 0x4FCE(t0)
+	beq v0, v1, (@@AndrossBrainDeadState1)
+	li v1, 0x15
+	beq v0, v1, (@@AndrossBrainDeadState2)
+	lw a0, orga(gLastTimerVenoms) (gp)
+	jr ra
+	sw a0, orga(gTimerScoreToDisplay) (gp)
+	nop
+@@AndrossBrainDeadState1:
+	lw a0, orga(gTimerScoreToDisplay) (gp)
+	sw a0, orga(gLastAND2Timer) (gp)
+	li v0, 1
+	jr ra
+	sw v0, orga(gTunnels2IsDoneFlag) (gp)
+	nop
+@@AndrossBrainDeadState2:
+	lw a0, orga(gLastAND2Timer) (gp)
+	jr ra
+	sw a0, orga(gTimerScoreToDisplay) (gp)
+	nop
+@@EndLogic:
+	jr ra
+	nop
 
 .endautoregion
