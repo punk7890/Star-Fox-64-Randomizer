@@ -751,6 +751,22 @@ SpecialModesPage1:
 	li a0, @CENTER_A0
 	jal @FUNC_RENDER_TEXT
 	li a1, @CENTER_MENU_ITEM_3_A1
+	li s6, @G_SETPRIMCOLOR		;menu option 3 start
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	lw t7, orga(gUserMenuColorValue) (gp)
+	sw t7, 0x0004(s0)
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, BossRushModeText
+	sw t8, 0x0010(sp)
+	li a0, @CENTER_A0
+	jal @FUNC_RENDER_TEXT
+	li a1, @CENTER_MENU_ITEM_4_A1
 	lw a0, orga(gMenuCursorValue) (gp)
 	lw a1, orga(gRandomizerPage3MaxOptions) (gp)
 	sltu v0, a0, a1
@@ -818,8 +834,8 @@ SpecialModesPage1:
 	beq a0, v0, (@@RandomOptionsPage3Option1)
 	li v0, 2
 	beq a0, v0, (@@RandomOptionsPage3Option2)
-	; li v0, 3
-	; beq a0, v0, (@@RandomOptionsPage1Option3)
+	li v0, 3
+	beq a0, v0, (@@RandomOptionsPage3Option3)
 	; li v0, 4
 	; beq a0, v0, (@@RandomOptionsPage1Option4)
 	; li v0, 5
@@ -860,14 +876,21 @@ SpecialModesPage1:
 	nop
 @@RandomOptionsPage3Option2:
 	sw r0, orga(gRandomPlanetsFlag) (gp)
-	sw r0, orga(gProtectTheTargetsModeFlag) (gp)	;;make conditional for this later
-	sw r0, orga(gBossRushModeFlag) (gp)
+	sw r0, orga(gProtectTheTargetsModeFlag) (gp)	;make conditional for this later
+	;sw r0, orga(gBossRushModeFlag) (gp)
 	;sw r0, orga(gEnduranceModeFlag) (gp)
 	lw a0, orga(gMarathonModeFlag) (gp)
 	xori a0, a0, 1
 	b (@@RenderOnOffText)
 	sw a0, orga(gMarathonModeFlag) (gp)
 	nop
+@@RandomOptionsPage3Option3:
+	sw r0, orga(gProtectTheTargetsModeFlag) (gp)
+	sw r0, orga(gEnduranceModeFlag) (gp)
+	lw a0, orga(gBossRushModeFlag) (gp)
+	xori a0, a0, 1
+	b (@@RenderOnOffText)
+	sw a0, orga(gBossRushModeFlag) (gp)
 	
 @@RenderOnOffText:
 
@@ -892,6 +915,14 @@ SpecialModesPage1:
 		li a0, @CENTER_MENU_ITEM_OFF_A0
 		sw a0, orga(gXposToRender) (gp)
 		li a1, @CENTER_MENU_ITEM_3_A1
+		jal PrintOnOffText
+		sw a1, orga(gYposToRender) (gp)
+		
+		li v0, gBossRushModeFlag
+		sw v0, orga(gOnOffLocationToRender) (gp)
+		li a0, @CENTER_MENU_ITEM_OFF_A0
+		sw a0, orga(gXposToRender) (gp)
+		li a1, @CENTER_MENU_ITEM_4_A1
 		jal PrintOnOffText
 		sw a1, orga(gYposToRender) (gp)
 
@@ -1359,12 +1390,27 @@ SUB_InGameText:		;function for displaying in-game text whenever. Can use at-t7 a
 @@Debugmodecheck:
 	lw v0, orga(gDebugModeFlag) (gp)
 	beq v0, r0, (CheckEnduranceMode)		;go to endurance mode check
-	
+	nop
 	/* debug mode section begin */
 	
+	jal CheckFoxState
+	nop
+	li v1, 0x1
+	beq v0, v1, (@@DebugModeRenderInGame)
+	li v1, 0x2
+	beq v0, v1, (@@DebugModeRenderInGame)
+	li v1, 0x3
+	beq v0, v1, (@@DebugModeRenderInGame)
+	li v1, 0x4
+	beq v0, v1, (@@DebugModeRenderInGame)
+	li v1, 0x5
+	beq v0, v1, (@@DebugModeRenderInGame)
+	li v1, 0x7
+	beq v0, v1, (@@DebugModeRenderInGame)
 	lb v0, (LOC_HAS_CONTROL_FLAG8)
 	beq v0, r0, (@@CheckMapScreenState)	
 	nop
+@@DebugModeRenderInGame:
 	li s6, @G_SETPRIMCOLOR
 	lw s0, 0x0000(s2)
 	sw s6, 0x0000(s0)
@@ -1381,6 +1427,7 @@ SUB_InGameText:		;function for displaying in-game text whenever. Can use at-t7 a
 	li a0, 0xA
 	jal @FUNC_RENDER_TEXT
 	li a1, 0x8
+	
 	li s6, @G_SETPRIMCOLOR
 	lw s0, 0x0000(s2)
 	sw s6, 0x0000(s0)
@@ -1396,6 +1443,7 @@ SUB_InGameText:		;function for displaying in-game text whenever. Can use at-t7 a
 	li a0, 0xA
 	jal @FUNC_RENDER_HEXTODEC
 	li a1, 0xC6
+	
 	li s6, @G_SETPRIMCOLOR
 	lw s0, 0x0000(s2)
 	sw s6, 0x0000(s0)
@@ -1406,9 +1454,80 @@ SUB_InGameText:		;function for displaying in-game text whenever. Can use at-t7 a
 	lw a2, (LOC_ALIVE_TIMER32)
 	jal @FUNC_HEXTODEC
 	or a0, a2, r0
-	li a0, 0x110
+	li a0, 0x112
 	jal @FUNC_RENDER_HEXTODEC
 	li a1, 0xC6
+	
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_WHITE
+	sw t7, 0x0004(s0)
+	lw a2, (LOC_ALLRANGEMODE_TIMER)
+	jal @FUNC_HEXTODEC
+	or a0, a2, r0
+	li a0, 0x112
+	jal @FUNC_RENDER_HEXTODEC
+	li a1, 0xBE
+	
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_BLUE
+	sw t7, 0x0004(s0)
+	lw a2, (LOC_CHECKPOINT_ALLRANGEMODE_FLAG)
+	jal @FUNC_HEXTODEC
+	or a0, a2, r0
+	li a0, 0x112
+	jal @FUNC_RENDER_HEXTODEC
+	li a1, 0xB6
+	
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_BLUE
+	sw t7, 0x0004(s0)
+	lw a2, (LOC_CHECKPOINT_HITS32)
+	jal @FUNC_HEXTODEC
+	or a0, a2, r0
+	li a0, 0x112
+	jal @FUNC_RENDER_HEXTODEC
+	li a1, 0xAE
+	
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_BLUE
+	sw t7, 0x0004(s0)
+	lw a2, (LOC_CHECKPOINT_SECTION_ID32)
+	jal @FUNC_HEXTODEC
+	or a0, a2, r0
+	li a0, 0x112
+	jal @FUNC_RENDER_HEXTODEC
+	li a1, 0xA6
+	
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_WHITE
+	sw t7, 0x0004(s0)
+	lw a2, (LOC_LEVEL_SECTION_ID32)
+	jal @FUNC_HEXTODEC
+	or a0, a2, r0
+	li a0, 0x112
+	jal @FUNC_RENDER_HEXTODEC
+	li a1, 0x9E
+	
 	jal CheckButtons		;check for D-Pad Up press to store checkpoint
 	li a0, 0x0
 	addiu a0, r0, BUTTON_D_PAD_UP16		;d-pad up press check
@@ -1543,12 +1662,29 @@ SUB_InGameText:		;function for displaying in-game text whenever. Can use at-t7 a
 	
 @@ButtonPressCheck8:
 	li a0, BUTTON_Z16 + BUTTON_R16 + BUTTON_L16		;speed up
-	bne a0, v0, (@@CheckMapScreenState)
+	bne a0, v0, (@@ButtonPressCheck9)
 	li a0, 0x0110
 	jal SetFoxState
 	lui a1, 0x42F0
+	li.u a0, SFX_1UP
+	jal PlaySFX
+	li.l a0, SFX_1UP
 	b (@@CheckMapScreenState)
 	nop
+	
+@@ButtonPressCheck9:
+	li a0, BUTTON_Z16 + BUTTON_R16		;add hypers
+	bne a0, v0, (@@CheckMapScreenState)
+	andi a0, v1, BUTTON_C_UP16
+	beq a0, r0, (@@CheckMapScreenState)
+	li a0, 2
+	sb a0, (LOC_PLAYER_LASER8)
+	li.u a0, SFX_OBTAIN_LASER
+	jal PlaySFX
+	li.l a0, SFX_OBTAIN_LASER
+	b (@@CheckMapScreenState)
+	nop
+	
 	
 @@CheckMapScreenState:
 	jal CheckMapScreenState
@@ -1742,7 +1878,7 @@ CheckEnduranceMode:		;check if flag is on for rendering text. Logic is in Endura
 	li a1, 0x11
 ProtectTheShipsCheck:
 	lw at, orga(gProtectTheTargetsModeFlag) (gp)
-	beq at, r0, (NextOption)
+	beq at, r0, (BossRushRenderText)
 	nop
 	jal CheckFoxState
 	li t7, 7
@@ -1751,7 +1887,7 @@ ProtectTheShipsCheck:
 	li t7, 1
 	beq at, t7, (@@RenderProtectTheShipsText)
 	nop
-	b (NextOption)
+	b (BossRushRenderText)
 	nop
 	
 @@RenderProtectTheShipsText:
@@ -1846,6 +1982,194 @@ ProtectTheShipsCheck:
 	li a0, 0x106
 	jal @FUNC_RENDER_HEXTODEC
 	li a1, 0xE0
+	
+	
+BossRushRenderText:
+	lw at, orga(gBossRushModeFlag) (gp)
+	beq at, r0, (NextOption)
+	; lb v0, (LOC_HAS_CONTROL_FLAG8)
+	; bne v0, r0, (@BeginRender)
+	; lw v0, (LOC_SPECIAL_STATE)
+	; li v1, 0x64
+	; beq v0, v1, (@BeginRender)
+	nop
+	jal CheckFoxState
+	nop
+	li v1, 0x3
+	beq v0, v1, (@BeginRender)
+	li v1, 0x5
+	beq v0, v1, (@BeginRender)
+	li v1, 0x7
+	beq v0, v1, (@BeginRender)
+	li v1, 0x2
+	beq v0, v1, (@BeginRender)
+	li v1, 0x9
+	beq v0, v1, (@BeginRender)
+	nop
+	jal CheckMapScreenState
+	li v1, 3
+	beq v0, v1, (@BRMDebugText)
+	li v1, 5
+	beq v0, v1, (@BRMDebugText)
+	nop
+	b (NextOption)
+	nop
+	
+@BeginRender:
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_WHITE
+	sw t7, 0x0004(s0)
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, BRMScoreText
+	sw t8, 0x0010(sp)
+	li a0, 0x6E
+	jal @FUNC_RENDER_TEXT
+	li a1, 0x8
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_WHITE	
+	sw t7, 0x0004(s0)
+	lw a2, orga(gTimerScoreToDisplay) (gp)	;score counter
+	jal @FUNC_HEXTODEC
+	or a0, a2, r0
+	sll v0, v0, 3
+	li v1, 0x93
+	subu a0, v1, v0
+	jal @FUNC_RENDER_HEXTODEC
+	li a1, 0x11
+	
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_WHITE
+	sw t7, 0x0004(s0)
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, BRMTotalScoreText
+	sw t8, 0x0010(sp)
+	li a0, 0xC2
+	jal @FUNC_RENDER_TEXT
+	li a1, 0x8
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_WHITE	
+	sw t7, 0x0004(s0)
+	lw a2, orga(gTimerFinalScore) (gp)	;total score counter
+	jal @FUNC_HEXTODEC
+	or a0, a2, r0
+	sll v0, v0, 3
+	li v1, 0xE7
+	subu a0, v1, v0
+	jal @FUNC_RENDER_HEXTODEC
+	li a1, 0x11
+@BRMDebugText:
+	lw v0, orga(gDebugModeFlag) (gp)
+	beq v0, r0, (NextOption)
+	nop
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_RED	
+	sw t7, 0x0004(s0)
+	lw a2, (LOC_PLAYER_HITS32)	;level hits
+	jal @FUNC_HEXTODEC
+	or a0, a2, r0
+	sll v0, v0, 3
+	li v1, 0x93
+	subu a0, v1, v0
+	jal @FUNC_RENDER_HEXTODEC
+	li a1, 0x19
+	
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_RED	
+	sw t7, 0x0004(s0)
+	lw a2, (LOC_PLAYER_TOTAL_HITS32)	;total score
+	jal @FUNC_HEXTODEC
+	or a0, a2, r0
+	sll v0, v0, 3
+	li v1, 0x93
+	subu a0, v1, v0
+	jal @FUNC_RENDER_HEXTODEC
+	li a1, 0x21
+	
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_WHITE
+	sw t7, 0x0004(s0)
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, BRMLastVenomTimersDEBUG
+	sw t8, 0x0010(sp)
+	li a0, 0xCB
+	jal @FUNC_RENDER_TEXT
+	li a1, 0x30
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_WHITE	
+	sw t7, 0x0004(s0)
+	lw a2, orga(gLastTimerVenoms) (gp)	;last VE timers
+	jal @FUNC_HEXTODEC
+	or a0, a2, r0
+	sll v0, v0, 3
+	li v1, 0x130
+	subu a0, v1, v0
+	jal @FUNC_RENDER_HEXTODEC
+	li a1, 0x38
+	
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	lw v0, orga(gTunnels2IsDoneFlag) (gp)
+	beq v0, r0, (@@Tun2FlagOff)
+	li t7, C_GREEN
+	b (@@Resume)
+	sw t7, 0x0004(s0)
+@@Tun2FlagOff:
+	li t7, C_RED
+	sw t7, 0x0004(s0)
+@@Resume:
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, BRMTunnelsFlagDEBUG
+	sw t8, 0x0010(sp)
+	li a0, 0xEE
+	jal @FUNC_RENDER_TEXT
+	li a1, 0x40
 	
 	
 NextOption:
