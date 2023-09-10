@@ -18,6 +18,7 @@ gRandoTable:	;always leave a zero after the last valid entry
 .d32 TBL_FUNC_ChoosePlanets
 .d32 TBL_FUNC_RandomPlanets
 .d32 TBL_FUNC_RandomItems
+.d32 TBL_FUNC_BossRushMode
 .d32 TBL_FUNC_RandomDeathItem
 .d32 TBL_FUNC_RainbowBombs
 .d32 TBL_FUNC_RandomPortraits
