@@ -91,7 +91,7 @@ TBL_FUNC_InitLevelEndVarsHOOK:		;Hooks into the end screen total hits display on
 	sw v0, orga(gEndScreenHookCreated) (gp)
 	nop
 	
-SUB_CustomEndScreenHook:	;level end screen custom function. Runs once (twice?) when on-screen. Can't remember all registers that are free to use, going off old code
+SUB_CustomEndScreenHook:	;level end screen custom function. Runs twice when on-screen. Can't remember all registers that are free to use, going off old code
 
 	addiu sp, sp, -8
 	sw ra, 0x0000(sp)
@@ -115,8 +115,9 @@ SUB_CustomEndScreenHook:	;level end screen custom function. Runs once (twice?) w
 	addu a1, at, a1
 	lw a2, orga(gTimerScoreToDisplay) (gp)
 	lui a3, 0x8015
+	lw a3, 0x7908(a3)	;grab current hits
 	addu a2, a2, a3
-	sw a2, 0xd9e0(a1)	;don't remember, some score related thing? Planet score?
+	sw a2, 0xd9e0(a1)	;store planet score
 @@SkipBRMCheck:
 	lw a2, orga(gEnduranceModeFlag) (gp)		;endurance mode checks
 	beq a2, r0, (@@SkipEnduranceModeCheck)
@@ -757,7 +758,7 @@ SUB_CustomItemDropFunction:
 	li t3, gRandomItemDropsTable ;load wherever table is
 @@ItemCheckLoop:
 	lw t4, 0x0000(t3)		;load new item in t4 for checks
-	beq t4, r0, (@@End)		;end if item loaded is zero
+	ble t4, r0, (@@End)		;end if item loaded is zero or -1
 	nop
 	beq t4, v0, (@@StoreNewItem)
 	addiu t3, t3, 0x0004 ;move table address by 4
