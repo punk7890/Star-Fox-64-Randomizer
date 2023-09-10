@@ -12,6 +12,8 @@
 	.include "src/CustomShips.asm"		;custom ships for survival mode and protect the targets
 	.include "src/ProtectTheTargetsMode.asm"	;custom mode for Katina.
 	;.include "src/SurvivalMode.asm"
+	.include "src/MarathonMode.asm"		;special mode where all planets can be completed in a single run
+	.include "src/BossRushMode.asm"		;special mode
 	.include "src/CustomFunctions.asm"	;place your useful custom functions for quick calls here
 	.include "src/CustomMenus.asm"		;custom menu related functions
 	.include "src/CustomMenuText.asm"	;text for custom menus
