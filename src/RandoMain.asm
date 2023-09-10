@@ -467,6 +467,22 @@ TBL_FUNC_ChoosePlanets:		;allows the player to choose planets with L button at t
 	li a0, 0
 	or t7, v0, r0
 	or t6, v1, r0
+	li a0, BUTTON_D_PAD_DOWN16
+	bne a0, t7, (@@CheckIfUp)
+	li.u a0, 0x00060007
+	jal DoSoftReset
+	li.l a0, 0x00060007
+	b (NextTableEntry)
+	nop
+@@CheckIfUp:
+	li a0, BUTTON_D_PAD_UP16
+	bne a0, t7, (@@CheckIfL)
+	li.u a0, 0x00130007
+	jal DoSoftReset
+	li.l a0, 0x00130007
+	b (NextTableEntry)
+	nop
+@@CheckIfL:
 	li a2, 0x437f
 	li a0, BUTTON_L16
 	bnel a0, t7, (@@ButtonPress)
@@ -771,6 +787,7 @@ SUB_CustomItemDropFunction:
 	lw t3, orga(gRandomItemDropsTable)(t3)
 	sh t3, 0x0010(s0)
 @@End:
+	lui at, 0x8017	;restore value on return since ble t4, r0, (@@End) uses AT
 	jr ra
 	lh v0, 0x0010(s0)
 	nop
