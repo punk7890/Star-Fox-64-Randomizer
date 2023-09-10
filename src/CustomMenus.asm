@@ -1387,6 +1387,23 @@ SUB_InGameText:		;function for displaying in-game text whenever. Can use at-t7 a
 	li a0, 0x12
 	jal @FUNC_RENDER_TEXT
 	li a1, 0x26
+	
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_WHITE
+	sw t7, 0x0004(s0)
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, ChoosePlanetsPlanetScreenText2
+	sw t8, 0x0010(sp)
+	li a0, 0x12
+	jal @FUNC_RENDER_TEXT
+	li a1, 0x2E
 @@Debugmodecheck:
 	lw v0, orga(gDebugModeFlag) (gp)
 	beq v0, r0, (CheckEnduranceMode)		;go to endurance mode check
@@ -1645,7 +1662,7 @@ SUB_InGameText:		;function for displaying in-game text whenever. Can use at-t7 a
 	b (@@CheckMapScreenState)
 	nop
 @@ButtonPressCheck7:
-	addiu a0, r0, BUTTON_Z16 + BUTTON_D_PAD_RIGHT16		;check for Z + C-Right to add life
+	addiu a0, r0, BUTTON_Z16 + BUTTON_D_PAD_RIGHT16		;check for Z + D-Right to add life
 	bne a0, v0, (@@ButtonPressCheck8)
 	andi a0, v1, BUTTON_D_PAD_RIGHT16
 	beq a0, r0, (@@ButtonPressCheck8)
@@ -1673,7 +1690,7 @@ SUB_InGameText:		;function for displaying in-game text whenever. Can use at-t7 a
 	nop
 	
 @@ButtonPressCheck9:
-	li a0, BUTTON_Z16 + BUTTON_R16		;add hypers
+	li a0, BUTTON_Z16 + BUTTON_R16 + BUTTON_C_UP16	;add hypers
 	bne a0, v0, (@@CheckMapScreenState)
 	andi a0, v1, BUTTON_C_UP16
 	beq a0, r0, (@@CheckMapScreenState)
@@ -2170,6 +2187,38 @@ BossRushRenderText:
 	li a0, 0xEE
 	jal @FUNC_RENDER_TEXT
 	li a1, 0x40
+	
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_WHITE
+	sw t7, 0x0004(s0)
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, BRMAND2ScoreDEBUG
+	sw t8, 0x0010(sp)
+	li a0, 0xEE
+	jal @FUNC_RENDER_TEXT
+	li a1, 0x48
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_WHITE	
+	sw t7, 0x0004(s0)
+	lw a2, orga(gLastAND2Timer) (gp)	;last AND2 timer
+	jal @FUNC_HEXTODEC
+	or a0, a2, r0
+	sll v0, v0, 3
+	li v1, 0x130
+	subu a0, v1, v0
+	jal @FUNC_RENDER_HEXTODEC
+	li a1, 0x50
 	
 	
 NextOption:
