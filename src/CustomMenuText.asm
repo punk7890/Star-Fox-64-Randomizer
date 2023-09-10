@@ -124,6 +124,9 @@ ChoosePlanetsText:
 ChoosePlanetsPlanetScreenText:
 .asciiz "L TO CHANGE PLANET"
 .align 4,0
+ChoosePlanetsPlanetScreenText2:
+.asciiz "D-PAD UP VE2 D-PAD DOWN VE1"
+.align 4,0
 
 QuickScoreScreensText:
 .asciiz "QUICK SCORE SCREENS"
@@ -173,6 +176,9 @@ BRMLastVenomTimersDEBUG:
 .align 4,0
 BRMTunnelsFlagDEBUG:
 .asciiz "TUN2 FLAG"
+.align 4,0
+BRMAND2ScoreDEBUG:
+.asciiz "LAST AND2 SCORE"
 .align 4,0
 
 DebugModeText:
