@@ -159,6 +159,22 @@ BillText:
 .asciiz "BILL"
 .align 4,0
 
+BossRushModeText:
+.asciiz "BOSS RUSH MODE"
+.align 4,0
+BRMScoreText:
+.asciiz "SCORE"
+.align 4,0
+BRMTotalScoreText:
+.asciiz "TOTAL"
+.align 4,0
+BRMLastVenomTimersDEBUG:
+.asciiz "LAST VE TIMERS"
+.align 4,0
+BRMTunnelsFlagDEBUG:
+.asciiz "TUN2 FLAG"
+.align 4,0
+
 DebugModeText:
 .asciiz "DEBUG MODE"
 .align 4,0
