@@ -295,7 +295,7 @@ CheckFoxState2:		;returns state in v0. Pass memory address based on Fox pointer 
 	lw t0, (LOC_FOX_POINTER32)
 	beq t0, r0, (@@End)
 	li v0, -1
-		addu a0, t0, a0
+		addu t0, a0, t0
 		lw v0, 0x0000(t0)
 @@End:
 		jr ra
@@ -393,6 +393,7 @@ ClearPlayerFlagsAndStatsInGP:		;put all game related flags here for clearing. Th
 	sw r0, orga(gLastAND2Timer) (gp)
 	sw r0, orga(gTunnels2IsDoneFlag) (gp)
 	sw r0, orga(gCornFlag) (gp)
+	sw r0, orga(gLTextWaitTimer) (gp)
 	jr ra
 	nop
 	
@@ -744,7 +745,45 @@ ResetRandomizerMenuCursors:		;call with a0. a0=0 reset X, 1 = reset Y, 2 = reset
 	sw a0, orga(gCursorStartingY) (gp)
 @@End:
 	jr ra
-	nop	
+	nop
+	
+AddBRMCursorValue:
+	lw v0, orga(gBRMMenuCursorValue) (gp)
+	lw v1, orga(gBRMMaxCursorValue) (gp)
+	addiu v0, v0, -1
+	bleu v0, v1, (@@DoAdd)
+	nop
+	sw r0, orga(gBRMMenuCursorValue) (gp)
+	lw v0, orga(gBRMMenuCursorYOrgPos) (gp)
+	jr ra
+	sw v0, orga(gBRMMenuCursorY) (gp)
+	nop
+@@DoAdd:
+	sw v0, orga(gBRMMenuCursorValue) (gp)
+	lw v0, orga(gBRMMenuCursorY) (gp)
+	addiu v0, v0, -10
+	jr ra
+	sw v0, orga(gBRMMenuCursorY) (gp)
+	nop
+	
+SubBRMCursorValue:
+	lw v0, orga(gBRMMenuCursorValue) (gp)
+	lw v1, orga(gBRMMaxCursorValue) (gp)
+	addiu v0, v0, 1
+	bge v0, v1, (@@DoReset)
+	nop
+	sw v0, orga(gBRMMenuCursorValue) (gp)
+	lw v0, orga(gBRMMenuCursorY) (gp)
+	addiu v0, v0, 10
+	jr ra
+	sw v0, orga(gBRMMenuCursorY) (gp)
+	nop
+@@DoReset:
+	sw r0, orga(gBRMMenuCursorValue) (gp)
+	lw v0, orga(gBRMMenuCursorYOrgPos) (gp)
+	jr ra
+	sw v0, orga(gBRMMenuCursorY) (gp)
+	nop
 	
 
 .endautoregion
