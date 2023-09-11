@@ -27,6 +27,8 @@
 	.definelabel LOC_PLAYER_LASER8, 0x8015791B
 	.definelabel LOC_PLAYER_HITS32, 0x80157908	;current level hits
 	.definelabel LOC_PLAYER_TOTAL_HITS32, 0x80157584
+	.definelabel LOC_WINGHEALTH_R32, 0x8016db80 ;right wing health
+	.definelabel LOC_WINGHEALTH_L32, 0x8016db98 ;left wing health
 	.definelabel LOC_LEVEL_SECTION_ID32, 0x8016DC38 ;current section of the level
 	.definelabel LOC_CHECKPOINT_ALLRANGEMODE_FLAG, 0x80155794 ;sets flag if checkpoint reached in all range mode levels
 	.definelabel LOC_CHECKPOINT_HITS32, 0x8015790C ;location that saved your current level hits after collecting a checkpoint
@@ -82,6 +84,7 @@
 	.definelabel SFX_OBTAIN_SILVER_RING, 0x4900000E
 	.definelabel SFX_OBTAIN_STAR, 0x4900000D
 	.definelabel SFX_1UP, 0x49000024
+	.definelabel SFX_BUMP, 0x4900002B	;some small bump sfx?
 	.definelabel SFX_ERROR, 0x4900000A ;unused SFX
 	.definelabel SFX_COUNTDOWN_TIMER, 0x4900002A
 	.definelabel SFX_PEPPER_STEEP_BILL, 0x000000FF	;this is one steep bill
