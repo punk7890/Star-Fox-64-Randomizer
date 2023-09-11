@@ -8,11 +8,11 @@
 .region 0x8000	;No idea how to properly use all 64kb of global pointer space with this compiler, so it's limited to 32kb.
 
 GLOBAL_POINTER:		;top of global pointer
-.asciiz "2023-09-09 22:19:00"
+.asciiz "2023-09-11 00:19:14"
 .align 4,0
 
 gDebugModeFlag:		;enables a set of test features
-.d32 1
+.d32 0
 
 gDebugModeFreezeFrameFlag:		
 .d32 0
@@ -74,7 +74,7 @@ gMarathonModeLevelList:
 .d8 0x3 ;A6
 .align 4,0xFF ;align end flag to 32 bit boundary
 
-gWaitTimer:		;used for special pause state (0x3 freeze game) to increment timer and use checks on. Only used for Marathon Mode at the moment.
+gWaitTimer:		;used for special pause state (0x3 freeze game) to increment timer and use checks on. Only used for Marathon Mode.
 .d32 0
 
 gExtraStarWolfsFlag:
@@ -257,17 +257,57 @@ gLastAND2Timer:
 gTunnels2IsDoneFlag:
 .d32 0
 gBRMVenom1TimeMARATHON:
-.d32 30000
+.d32 32000
 gBRMVenom1TimeREGULAR:
 .d32 18000
 gBRMVenom2TimeREGULAR:
 .d32 20500
 gTimerScoreREGULAR:
 .d32 10000
-gBRMExportAddScore:
-.d32 200
+gBRMExpertAddScore:
+.d32 300
 gCornFlag:	;0 = Mech all range boss, 1 = ship boss
 .d32 0
+gLTextWaitTimer:	;timer for press L to open item menu text to render on-screen
+.d32 0
+gBRMMenuState:	;menu active or not
+.d32 0
+gBRMMenuCursorValue:
+.d32 0
+gBRMMaxCursorValue:
+.d32 7
+gBRMMenuCursorY:
+.d32 65
+gBRMMenuCursorX:
+.d32 68
+gBRMMenuCursorYOrgPos:
+.d32 65
+gBRMMenuCursorXOrgPos:
+.d32 68
+gBombCost:
+.d32 500
+gLaserCost:
+.d32 800
+gQuarterHealthCost:
+.d32 2500
+gHalfHealthCost:
+.d32 3400
+g1upCost:
+.d32 3000
+gRepairCost:
+.d32 2100
+gShieldCost:
+.d32 12000
+gShieldTimer:
+.d32 512
+gOldHealth:
+.d32 255
+gOldWingHealthR:
+.d32 60
+gOldWingHealthL:
+.d32 60
+gOldWingStates:
+.d32 0x0202
 gBRMLevelList:	;if MA mode is on
 ;.d8 0xA ;training if MA mode is on
 .d8 0x0 ;corn
