@@ -34,6 +34,8 @@ TBL_FUNC_BossRushMode:
 	nop
 	jal @DoTimerLogic
 	nop
+	jal @SetupItems
+	nop
 	lb v0, (LOC_ENDSCREEN_FLAG8)
 	bne v0, r0, (@@EndSceneChecks)	;check if only end screen is displaying
 	addu v0, s1, v0
@@ -472,6 +474,7 @@ TBL_FUNC_BossRushMode:
 	sw a0, orga(gCornFlag) (gp)
 @@MarathonNotOn:
 	sw r0, orga(gTimerActive) (gp)
+	sw r0, orga(gLTextWaitTimer) (gp)
 	;sw r0, orga(gBRMAddToCompletedTimesFlag) (gp)
 	lw a0, orga(gTimerScoreREGULAR) (gp)
 	sw a0, orga(gTimerScoreToDisplay) (gp)
@@ -510,7 +513,7 @@ TBL_FUNC_BossRushMode:
 	nop
 	
 	
-	/* sub functions */
+	/* Sub Functions */
 	
 	
 @CheckPrevLivesBRM:
@@ -557,7 +560,7 @@ TBL_FUNC_BossRushMode:
 	sw r0, orga(gTimerActive) (gp)
 	nop
 	
-@@DoEndScreenCalcs:
+@@DoEndScreenCalcs:		;this would look less messy, but the game does weird things with Fox states on Venom surface and tunnels
 	lw v0, orga(gTimerActive) (gp)
 	beq v0, r0, (@@EndCalcs2)
 	; lw v0, (LOC_EXPERT_FLAG32)
@@ -565,7 +568,17 @@ TBL_FUNC_BossRushMode:
 	lw v1, (LOC_PLAYER_HITS32)
 	lw a0, (LOC_PLAYER_TOTAL_HITS32)
 	lw a1, orga(gTimerScoreToDisplay) (gp)
+	lw v0, (LOC_SUB_SECTION_FLAG32)
+	bne v0, r0, (@@Tunnel2Check)
+	li v0, 0x9
+	b @@ResumeScore
+	nop
+@@Tunnel2Check:
+	bne s2, v0, (@@ScoreNotAdded)	;player in tunnels 2 so skip storing timer into old
+	nop
+@@ResumeScore:
 	sw a1, orga(gLastTimerVenoms) (gp)
+@@ScoreNotAdded:
 	addu a3, a0, v1
 	addu a3, a3, a1		;full totals in a3
 	addu a2, a0, a1 	;only add player total hits and boss timer score into a2 as level hits automatically get added by game logic
@@ -623,15 +636,16 @@ TBL_FUNC_BossRushMode:
 	jr ra
 	nop
 	
-@DoTimerLogic:	;might not work for death state 0 for andross brain checks
-	lw v0, orga(gTimerActive) (gp)
-	beq v0, r0, (@@EndLogic)
-@@DeadStateChecks:
+@DoTimerLogic:	;this would look less messy, but the game does weird things with Fox states on Venom surface and tunnels
+	; lw v0, orga(gTimerActive) (gp)
+	; beq v0, r0, (@@EndLogic)
+; @@DeadStateChecks:
 	li v0, 0x4
 	beq s1, v0, (@@IsDeadState4)	;checks for if dead or retrying
 	li v0, 0x0
 	beq s1, v0, (@@IsDeadState0)
 	lw a0, orga(gTimerScoreToDisplay) (gp)
+	beq a0, r0, (@@EndLogic)
 	addiu a0, a0, -1
 	bltl a0, 0, (@@UnderflowStore)
 	or a0, r0, r0
@@ -692,6 +706,50 @@ TBL_FUNC_BossRushMode:
 	sw a0, orga(gTimerScoreToDisplay) (gp)
 	nop
 @@EndLogic:
+	jr ra
+	nop
+	
+@SetupItems:		;sets wing health, lasers, etc on level start and end
+	li v0, 0x7
+	beq s1, v0, (@@StoreEndingItems)
+	lw v0, (LOC_ALIVE_TIMER32)
+	li v1, 2
+	bne v0, v1, (@@EndSetupItems)
+	lb v0, (LOC_HAS_CONTROL_FLAG8)
+	beq v0, r0, (@@EndSetupItems)
+	lw t0, (LOC_FOX_POINTER32)
+	lw a0, orga(gOldHealth) (gp)
+	sw a0, 0x0264(t0)
+	lw a0, orga(gOldWingHealthR) (gp)
+	sw a0, (LOC_WINGHEALTH_R32)
+	lw a0, orga(gOldWingHealthL) (gp)
+	sw a0, (LOC_WINGHEALTH_L32)
+	lw a0, orga(gOldWingStates) (gp)
+	sh a0, 0x049C(t0)
+	sb r0, (LOC_PLAYER_BOMBS8)
+	sb r0, (LOC_PLAYER_LASER8)
+	jr ra
+	nop
+@@StoreEndingItems:
+	; lw v0, orga(gTunnels2IsDoneFlag) (gp)
+	; beq v0, r0, (@@EndSetupItems)	;skip tunnels 2 retry after braindross
+	; let the player suffer if they die in the tunnels 2 escape
+	lw v0, (LOC_INTRO_OUTRO_TIMER32)
+	li v1, 1
+	bne v0, v1, (@@EndSetupItems)
+	lw t0, (LOC_FOX_POINTER32)
+	lw a0, 0x0264(t0)	;grab health
+	sw a0, orga(gOldHealth) (gp)
+	lw a0, (LOC_WINGHEALTH_R32)
+	sw a0, orga(gOldWingHealthR) (gp)
+	lw a0, (LOC_WINGHEALTH_L32)
+	sw a0, orga(gOldWingHealthL) (gp)
+	lh a0, 0x049C(t0)
+	jr ra
+	sh a0, orga(gOldWingStates) (gp)
+	nop
+	
+@@EndSetupItems:
 	jr ra
 	nop
 
