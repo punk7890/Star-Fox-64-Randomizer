@@ -1195,7 +1195,7 @@ RandomMiscPage1:
 	nop
 @@RandomOptionsPage4Option4:
 	sw r0, orga(gMarathonModeFlag) (gp)
-	sw r0, orga(gBossRushModeFlag) (gp)
+	;sw r0, orga(gBossRushModeFlag) (gp)
 	sw r0, orga(gRandomPlanetsFlag) (gp)
 	lw a0, orga(gEnablePlanetSelections) (gp)
 	xori a0, a0, 1
@@ -1545,6 +1545,58 @@ SUB_InGameText:		;function for displaying in-game text whenever. Can use at-t7 a
 	jal @FUNC_RENDER_HEXTODEC
 	li a1, 0x9E
 	
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_WHITE
+	sw t7, 0x0004(s0)
+	jal CheckFoxState2	;check health
+	li a0, 0x0264
+	or a2, v0, r0
+	jal @FUNC_HEXTODEC
+	or a0, a2, r0
+	li a0, 0x20
+	jal @FUNC_RENDER_HEXTODEC
+	li a1, 0x14
+	
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_WHITE
+	sw t7, 0x0004(s0)
+	lw a2, (LOC_WINGHEALTH_R32)	;check wing R
+	bltl a2, r0, (@@WingRZeroNotOverflow)
+	or a2, r0, r0
+@@WingRZeroNotOverflow:
+	jal @FUNC_HEXTODEC
+	or a0, a2, r0
+	li a0, 0x32
+	jal @FUNC_RENDER_HEXTODEC
+	li a1, 0x32
+	
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_WHITE
+	sw t7, 0x0004(s0)
+	lw a2, (LOC_WINGHEALTH_L32)	;check wing L
+	bltl a2, r0, (@@WingLZeroNotOverflow)
+	or a2, r0, r0
+@@WingLZeroNotOverflow:
+	jal @FUNC_HEXTODEC
+	or a0, a2, r0
+	li a0, 0x20
+	jal @FUNC_RENDER_HEXTODEC
+	li a1, 0x32
+	lw v0, orga(gBRMMenuState) (gp)
+	bne v0, r0, (@@CheckMapScreenState)	;skip debug buttons if BRM menu is active
+	nop
 	jal CheckButtons		;check for D-Pad Up press to store checkpoint
 	li a0, 0x0
 	addiu a0, r0, BUTTON_D_PAD_UP16		;d-pad up press check
@@ -2013,15 +2065,15 @@ BossRushRenderText:
 	jal CheckFoxState
 	nop
 	li v1, 0x3
-	beq v0, v1, (@BeginRender)
+	beq v0, v1, (@RenderScores)
 	li v1, 0x5
-	beq v0, v1, (@BeginRender)
+	beq v0, v1, (@RenderScores)
 	li v1, 0x7
-	beq v0, v1, (@BeginRender)
+	beq v0, v1, (@RenderScores)
 	li v1, 0x2
-	beq v0, v1, (@BeginRender)
+	beq v0, v1, (@RenderScores)
 	li v1, 0x9
-	beq v0, v1, (@BeginRender)
+	beq v0, v1, (@RenderScores)
 	nop
 	jal CheckMapScreenState
 	li v1, 3
@@ -2032,7 +2084,7 @@ BossRushRenderText:
 	b (NextOption)
 	nop
 	
-@BeginRender:
+@RenderScores:
 	li s6, @G_SETPRIMCOLOR
 	lw s0, 0x0000(s2)
 	sw s6, 0x0000(s0)
@@ -2096,6 +2148,554 @@ BossRushRenderText:
 	subu a0, v1, v0
 	jal @FUNC_RENDER_HEXTODEC
 	li a1, 0x11
+	lui v1, 0x8017
+	lw v0, 0xD958(v1)	;check if shield timer is off
+	beq v0, r0, (@@TurnOffShield)
+	nop
+	
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_CYAN
+	sw t7, 0x0004(s0)
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, BRMShieldOnScreenText
+	sw t8, 0x0010(sp)
+	li a0, 0xF8
+	jal @FUNC_RENDER_TEXT
+	li a1, 0x30
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_CYAN	
+	sw t7, 0x0004(s0)
+	lw a2, (0x8016D958)	;shield timer
+	jal @FUNC_HEXTODEC
+	or a0, a2, r0
+	sll v0, v0, 3
+	li v1, 0x120
+	subu a0, v1, v0
+	jal @FUNC_RENDER_HEXTODEC
+	li a1, 0x39
+	b (@RenderItemMenu)
+	nop
+@@TurnOffShield:
+	sw r0, 0xD958(v1)
+	sw r0, 0xD940(v1)
+	b (@RenderItemMenu)
+	nop
+@RenderItemMenu:
+	lb v0, (LOC_HAS_CONTROL_FLAG8)
+	beq v0, r0, (@BRMDebugText)
+	lw v0, (LOC_NUM_PLANETS_COMPLETED32)
+	bne v0, r0, (@@BRMInPauseScreenChecks)		;don't render press L text since not first planet
+	lw v0, orga(gLTextWaitTimer) (gp)
+	addiu v0, v0, 1
+	sw v0, orga(gLTextWaitTimer) (gp)
+	li v1, 0x90
+	bgt v0, v1, (@@BRMInPauseScreenChecks)
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_GREEN
+	sw t7, 0x0004(s0)
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, BRMPressLText
+	sw t8, 0x0010(sp)
+	li a0, 0x32
+	jal @FUNC_RENDER_TEXT
+	li a1, 0xDE
+	
+@@BRMInPauseScreenChecks:
+	lw v0, (LOC_PAUSE_STATE32)
+	li v1, 1
+	bne v0, v1, (@BRMDebugText)
+	li a0, 0
+	jal CheckButtons
+	nop
+	or t0, v1, r0
+	andi v1, t0, BUTTON_L16
+	beq v1, r0, (@@CheckMenuState)
+	lw a0, orga(gBRMMenuState) (gp)
+	xori a0, a0, 1
+	sw a0, orga(gBRMMenuState) (gp)
+@@CheckMenuState:
+	beq a0, r0, (@@MenuOff)
+	lui t1, 0x8009
+	sw r0, 0xb9e8(t1)	;remove pause menu graphics and control calls
+	sw r0, 0xb9f0(t1)
+	lui t1, 0x800A
+	sw r0, 0xeba4(t1)
+	andi v1, t0, BUTTON_D_PAD_UP16
+	beq v1, r0, (@@IfDown)
+	nop
+	jal AddBRMCursorValue
+	nop
+	li.u a0, SFX_MOVE_CURSOR
+	jal PlaySFX
+	li.l a0, SFX_MOVE_CURSOR
+	b (@@RenderBRMMenu)
+	nop
+@@IfDown:
+	andi v1, t0, BUTTON_D_PAD_DOWN16
+	beq v1, r0, (@@IfA)
+	nop
+	jal SubBRMCursorValue
+	nop
+	li.u a0, SFX_MOVE_CURSOR
+	jal PlaySFX
+	li.l a0, SFX_MOVE_CURSOR
+	b (@@RenderBRMMenu)
+	nop
+@@IfA:
+	andi v1, t0, BUTTON_A16
+	beq v1, r0, (@@RenderBRMMenu)
+	lw a0, orga(gBRMMenuCursorValue) (gp)
+	li v0, 0	;first menu item is bombs
+	bne v0, a0, (@@IfLasers)	;cursor not on bombs when A is pressed, go to laser check
+	nop
+	lw a0, orga(gBombCost) (gp)
+	lw a1, (LOC_PLAYER_TOTAL_HITS32)
+	subu a0, a1, a0
+	ble a0, r0, (@@PlayErrorSFX)	;score under amount, skip
+	lb a2, (LOC_PLAYER_BOMBS8)
+	addiu a2, a2, 1
+	sltiu a3, a2, 10	;if bombs going over 9, don't add
+	beq a3, r0, (@@PlayErrorSFX)
+	nop
+	sb a2, (LOC_PLAYER_BOMBS8)
+	sw a0, (LOC_PLAYER_TOTAL_HITS32)
+	sw a0, orga(gTimerFinalScore) (gp)
+	li.u a0, SFX_OBTAIN_BOMB
+	jal PlaySFX
+	li.l a0, SFX_OBTAIN_BOMB
+	b (@@RenderBRMMenu)
+	nop
+	
+@@IfLasers:
+	li v0, 1
+	bne v0, a0, (@@IfQuarterHealth)
+	nop
+	lw a0, orga(gLaserCost) (gp)
+	lw a1, (LOC_PLAYER_TOTAL_HITS32)
+	subu a0, a1, a0
+	ble a0, r0, (@@PlayErrorSFX)
+	lb a2, (LOC_PLAYER_LASER8)
+	addiu a2, a2, 1
+	sltiu a3, a2, 3
+	beq a3, r0, (@@PlayErrorSFX)
+	nop
+	sb a2, (LOC_PLAYER_LASER8)
+	sw a0, (LOC_PLAYER_TOTAL_HITS32)
+	sw a0, orga(gTimerFinalScore) (gp)
+	li.u a0, SFX_OBTAIN_LASER
+	jal PlaySFX
+	li.l a0, SFX_OBTAIN_LASER
+	b (@@RenderBRMMenu)
+	nop
+	
+@@IfQuarterHealth:
+	li v0, 2
+	bne v0, a0, (@@IfHalfHealth)
+	nop
+	lw a0, orga(gQuarterHealthCost) (gp)
+	lw a1, (LOC_PLAYER_TOTAL_HITS32)
+	subu a0, a1, a0
+	ble a0, r0, (@@PlayErrorSFX)
+	or t1, a0, r0
+	jal CheckFoxState2
+	li a0, 0x0264
+	li v1, 0x3F
+	addu a3, v0, v1
+	sltiu v0, a3, 0x0100
+	beq v0, r0, (@@PlayErrorSFX)
+	or a1, a3, r0
+	jal SetFoxState
+	li a0, 0x0264
+	sw t1, (LOC_PLAYER_TOTAL_HITS32)
+	sw t1, orga(gTimerFinalScore) (gp)
+	li.u a0, SFX_OBTAIN_SILVER_RING
+	jal PlaySFX
+	li.l a0, SFX_OBTAIN_SILVER_RING
+	b (@@RenderBRMMenu)
+	nop
+	
+@@IfHalfHealth:
+	li v0, 3
+	bne v0, a0, (@@If1up)
+	nop
+	lw a0, orga(gHalfHealthCost) (gp)
+	lw a1, (LOC_PLAYER_TOTAL_HITS32)
+	subu a0, a1, a0
+	ble a0, r0, (@@PlayErrorSFX)
+	or t1, a0, r0
+	jal CheckFoxState2
+	li a0, 0x0264
+	li v1, 0x7F
+	addu a3, v0, v1
+	sltiu v0, a3, 0x0100
+	beq v0, r0, (@@PlayErrorSFX)
+	or a1, a3, r0
+	jal SetFoxState
+	li a0, 0x0264
+	sw t1, (LOC_PLAYER_TOTAL_HITS32)
+	sw t1, orga(gTimerFinalScore) (gp)
+	li.u a0, SFX_OBTAIN_STAR
+	jal PlaySFX
+	li.l a0, SFX_OBTAIN_STAR
+	b (@@RenderBRMMenu)
+	nop
+	
+@@If1up:
+	li v0, 4
+	bne v0, a0, (@@IfRepair)
+	nop
+	lw a0, orga(g1upCost) (gp)
+	lw a1, (LOC_PLAYER_TOTAL_HITS32)
+	subu a0, a1, a0
+	ble a0, r0, (@@PlayErrorSFX)
+	lb a1, (LOC_PLAYER_LIVES8)
+	addiu a1, a1, 1
+	li v0, 0x64
+	beq a1, v0, (@@PlayWHATSFX1up)
+	addiu v0, v0, -1
+	sb a1, (LOC_PLAYER_LIVES8)
+	sw a0, (LOC_PLAYER_TOTAL_HITS32)
+	sw a0, orga(gTimerFinalScore) (gp)
+	li.u a0, SFX_1UP
+	jal PlaySFX
+	li.l a0, SFX_1UP
+	b (@@RenderBRMMenu)
+	nop
+@@PlayWHATSFX1up:
+	sb v0, (LOC_PLAYER_LIVES8)
+	sw a0, (LOC_PLAYER_TOTAL_HITS32)
+	sw a0, orga(gTimerFinalScore) (gp)
+	li.u a0, SFX_PEPPER_WHAT
+	jal PlaySFX
+	li.l a0, SFX_PEPPER_WHAT
+	b (@@RenderBRMMenu)
+	nop
+
+@@IfRepair:
+	li v0, 5
+	bne v0, a0, (@@IfShield)
+	nop
+	lw a0, orga(gRepairCost) (gp)
+	lw a1, (LOC_PLAYER_TOTAL_HITS32)
+	subu a0, a1, a0
+	ble a0, r0, (@@PlayErrorSFX)
+	or t1, a0, r0
+	li v0, 0x3C
+	sw v0, (LOC_WINGHEALTH_R32)
+	sw v0, (LOC_WINGHEALTH_L32)
+	lui a1, 0x0202
+	jal SetFoxState
+	li a0, 0x049C
+	sw t1, (LOC_PLAYER_TOTAL_HITS32)
+	sw t1, orga(gTimerFinalScore) (gp)
+	li.u a0, SFX_1UP
+	jal PlaySFX
+	li.l a0, SFX_1UP
+	b (@@RenderBRMMenu)
+	nop
+	
+@@IfShield:
+	li v0, 6
+	bne v0, a0, (@@RenderBRMMenu)
+	nop
+	lw a0, orga(gShieldCost) (gp)
+	lw a1, (LOC_PLAYER_TOTAL_HITS32)
+	subu a0, a1, a0
+	ble a0, r0, (@@PlayErrorSFX)
+	li v0, 1
+	lw v1, orga(gShieldTimer) (gp)
+	lw a2, (0x8016D958)
+	addu a2, a2, v1
+	sw v0, (0x8016D940) ;shield on state for inf health
+	sw a2, (0x8016D958) ;shield timer for inf wing health and display shield effect
+	sw a0, (LOC_PLAYER_TOTAL_HITS32)
+	sw a0, orga(gTimerFinalScore) (gp)
+	li.u a0, SFX_BUMP
+	jal PlaySFX
+	li.l a0, SFX_BUMP
+	b (@@RenderBRMMenu)
+	nop
+	
+	
+@@PlayErrorSFX:
+	li.u a0, SFX_ERROR
+	jal PlaySFX
+	li.l a0, SFX_ERROR
+	b (@@RenderBRMMenu)
+	nop
+	
+@@RenderBRMMenu:
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_CYAN
+	sw t7, 0x0004(s0)
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, BRMAddBombText
+	sw t8, 0x0010(sp)
+	li a0, 0x4E
+	jal @FUNC_RENDER_TEXT
+	li a1, 0x40
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_WHITE	
+	sw t7, 0x0004(s0)
+	lw a2, orga(gBombCost) (gp)
+	jal @FUNC_HEXTODEC
+	or a0, a2, r0
+	sll v0, v0, 3
+	li v1, 0x110
+	subu a0, v1, v0
+	jal @FUNC_RENDER_HEXTODEC
+	li a1, 0x40
+	
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_CYAN
+	sw t7, 0x0004(s0)
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, BRMAddLaserText
+	sw t8, 0x0010(sp)
+	li a0, 0x4E
+	jal @FUNC_RENDER_TEXT
+	li a1, 0x4A
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_WHITE	
+	sw t7, 0x0004(s0)
+	lw a2, orga(gLaserCost) (gp)
+	jal @FUNC_HEXTODEC
+	or a0, a2, r0
+	sll v0, v0, 3
+	li v1, 0x110
+	subu a0, v1, v0
+	jal @FUNC_RENDER_HEXTODEC
+	li a1, 0x4A
+	
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_CYAN
+	sw t7, 0x0004(s0)
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, BRMAddQuarterHealthText
+	sw t8, 0x0010(sp)
+	li a0, 0x4E
+	jal @FUNC_RENDER_TEXT
+	li a1, 0x54
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_WHITE	
+	sw t7, 0x0004(s0)
+	lw a2, orga(gQuarterHealthCost) (gp)
+	jal @FUNC_HEXTODEC
+	or a0, a2, r0
+	sll v0, v0, 3
+	li v1, 0x110
+	subu a0, v1, v0
+	jal @FUNC_RENDER_HEXTODEC
+	li a1, 0x54
+	
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_CYAN
+	sw t7, 0x0004(s0)
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, BRMAddHalfHealthText
+	sw t8, 0x0010(sp)
+	li a0, 0x4E
+	jal @FUNC_RENDER_TEXT
+	li a1, 0x5E
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_WHITE	
+	sw t7, 0x0004(s0)
+	lw a2, orga(gHalfHealthCost) (gp)
+	jal @FUNC_HEXTODEC
+	or a0, a2, r0
+	sll v0, v0, 3
+	li v1, 0x110
+	subu a0, v1, v0
+	jal @FUNC_RENDER_HEXTODEC
+	li a1, 0x5E
+	
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_CYAN
+	sw t7, 0x0004(s0)
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, BRMAddLifeText
+	sw t8, 0x0010(sp)
+	li a0, 0x4E
+	jal @FUNC_RENDER_TEXT
+	li a1, 0x68
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_WHITE	
+	sw t7, 0x0004(s0)
+	lw a2, orga(g1upCost) (gp)
+	jal @FUNC_HEXTODEC
+	or a0, a2, r0
+	sll v0, v0, 3
+	li v1, 0x110
+	subu a0, v1, v0
+	jal @FUNC_RENDER_HEXTODEC
+	li a1, 0x68
+	
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_CYAN
+	sw t7, 0x0004(s0)
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, BRMAddRepairText
+	sw t8, 0x0010(sp)
+	li a0, 0x4E
+	jal @FUNC_RENDER_TEXT
+	li a1, 0x72
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_WHITE	
+	sw t7, 0x0004(s0)
+	lw a2, orga(gRepairCost) (gp)
+	jal @FUNC_HEXTODEC
+	or a0, a2, r0
+	sll v0, v0, 3
+	li v1, 0x110
+	subu a0, v1, v0
+	jal @FUNC_RENDER_HEXTODEC
+	li a1, 0x72
+	
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_CYAN
+	sw t7, 0x0004(s0)
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, BRMAddShieldText
+	sw t8, 0x0010(sp)
+	li a0, 0x4E
+	jal @FUNC_RENDER_TEXT
+	li a1, 0x7C
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_WHITE	
+	sw t7, 0x0004(s0)
+	lw a2, orga(gShieldCost) (gp)
+	jal @FUNC_HEXTODEC
+	or a0, a2, r0
+	sll v0, v0, 3
+	li v1, 0x110
+	subu a0, v1, v0
+	jal @FUNC_RENDER_HEXTODEC
+	li a1, 0x7C
+	
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_WHITE
+	sw t7, 0x0004(s0)
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, CursorText
+	sw t8, 0x0010(sp)
+	lw a0, orga(gBRMMenuCursorX) (gp)
+	jal @FUNC_RENDER_TEXT
+	lw a1, orga(gBRMMenuCursorY) (gp)
+	b (@BRMDebugText)
+	nop
+	
+@@MenuOff:
+	li v0, 0x0c021e04
+	sw v0, 0x8008b9e8
+	li v0, 0x0c021140
+	sw v0, (0x8008b9f0)
+	li v0, 0x0c02d091
+	sw v0, (0x8009eba4)
+	b @BRMDebugText
+	nop
+	
 @BRMDebugText:
 	lw v0, orga(gDebugModeFlag) (gp)
 	beq v0, r0, (NextOption)
@@ -2224,18 +2824,6 @@ BossRushRenderText:
 NextOption:
 	b (ExitInGameText)
 	nop
-
-	
-; @@FixPauseMenuOpCodes: for later
-
-	; li v0, 0x0c021e04
-	; sw v0, 0x8008b9e8
-	; li v0, 0x0c021140
-	; sw v0, (0x8008b9f0)
-	; li v0, 0x0c02d091
-	; sw v0, (0x8009eba4)
-	; b @@Exit
-	; nop
 	
 ExitInGameText:
 	lw ra, 0x004c(sp)
