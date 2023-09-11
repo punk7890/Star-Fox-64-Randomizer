@@ -394,6 +394,13 @@ ClearPlayerFlagsAndStatsInGP:		;put all game related flags here for clearing. Th
 	sw r0, orga(gTunnels2IsDoneFlag) (gp)
 	sw r0, orga(gCornFlag) (gp)
 	sw r0, orga(gLTextWaitTimer) (gp)
+	li t7, 255
+	sw t7, orga(gOldHealth) (gp)
+	li t7, 60
+	sw t7, orga(gOldWingHealthR) (gp)
+	sw t7, orga(gOldWingHealthL) (gp)
+	li t7, 0x0202
+	sw t7, orga(gOldWingStates) (gp)
 	jr ra
 	nop
 	
