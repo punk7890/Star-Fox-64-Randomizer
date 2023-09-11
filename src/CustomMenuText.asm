@@ -171,6 +171,33 @@ BRMScoreText:
 BRMTotalScoreText:
 .asciiz "TOTAL"
 .align 4,0
+BRMPressLText:
+.asciiz "PAUSE AND PRESS L FOR ITEM MENU"
+.align 4,0
+BRMAddBombText:
+.asciiz "ADD BOMB"
+.align 4,0
+BRMAddLaserText:
+.asciiz "ADD LASER"
+.align 4,0
+BRMAddQuarterHealthText:
+.asciiz "ADD QUARTER HEALTH"
+.align 4,0
+BRMAddHalfHealthText:
+.asciiz "ADD HALF HEALTH"
+.align 4,0
+BRMAddLifeText:
+.asciiz "ADD LIFE"
+.align 4,0
+BRMAddRepairText:
+.asciiz "REPAIR WINGS"
+.align 4,0
+BRMAddShieldText:
+.asciiz "PERFECT SHIELD"
+.align 4,0
+BRMShieldOnScreenText:
+.asciiz "SHIELD"
+.align 4,0
 BRMLastVenomTimersDEBUG:
 .asciiz "LAST VE TIMERS"
 .align 4,0
