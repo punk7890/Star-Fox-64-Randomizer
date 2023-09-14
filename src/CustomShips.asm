@@ -2,7 +2,234 @@
 .n64
 .autoregion	
 	
-	;custom ship spawns for Survival mode and Protect the Targets.
+	;custom ship spawns for Survival mode and Protect the Targets. Use SpawnSingleCraftSpecial for any all range mode generic ship
+	;Craft memory space starts at 0x80159E50, seems to end at 80164C8C for the last space
+	;Each craft space is 0x2F4 in size
+	;Starting from the respective actor space. Katina Bill for example. at 0x8015B8E4
+	; 0x0 half Active state (0x2, 0x3 dying)
+	; 0x2 half Craft ID (0x00C5 for typical all range mode enemies. C6 / allies?. Anything else is level specfic. C3 intros only?)
+	; 0x4 0x8 0xC floats xyz starting pos 
+	; 0x10?
+	; 0x24 32bit address to logic function. Starwolfs is 0x8002D53C
+	; 0x38 Can be targeted (float)
+	; 0x3C byte for how many hits if killed
+	; 0x44 byte drops item. 01 silver, 02 silver but random?, 05 bomb, 9 laser, D 1up E gold ring
+	; 0xB6 half Type of Craft / laser type (reserved for certain IDs). 0003 shielded enemy. same as 00 but shielded. 
+	; Below model IDS 0xA:
+	; 00 red laser, 
+	; 01 single green, 
+	; 02 dual green
+	; Above model IDs 0xA: (has a check at 80031560)
+	; 00 = ship from multi player
+	; 01 bill friends
+	; 03 enemy but shielded (nop 8002C510 for unshielded)
+	; 0xB8 half State of craft (01, speed up to fox, 02 seek target, 6, leave area and despawn 7, summersalt 8 uturn, 0xA spin)
+	; 0xBC half? Special state timer, for intro and 0xA state
+	; 0xBE half Timer to next state
+	; 0x70 word (also state of craft? starts out as 1)
+	; 0xC2 half Invincable timer 
+	; 0xC9 ?
+	; 0xCE half Health (only for C5?)
+	; 0xD6 half damage to take
+	; 0xE4 half Sub craft model / function ID lookup (if C5). common table at 800311DC. If A or over, takes model ID in 0xB6
+	; 0xE6 half Craft to target
+
+	; BE / BF missiles:
+	; 0x3C byte points when killed
+	; 0x54 half if BE, ID of craft to target. 00 fox, 02 slippy, 03 peppy
+	; 0xB4 half model. 0000 missile, 0001 ship that shoots and follows
+	; 0x128 float speed
+	
+SpawnSingleCraftSpecial:	
+	;pass a0 as the memory address to spawn in. 
+	;a1 the craft ID to target. 
+	;a2 item to drop. 
+	;t0 to t2 = x,y, z to spawn at
+	;t3 = can be targeted or not (0 for not, 0x42000000 for can lock on)
+	;t4 = model of craft
+	;t5 = laser type / other model
+	;t6 = health
+	;t7 = hits when killed
+	;t8 = engine sound (leave 0 for none. Too many sounds can null out other sounds)
+	;v0 = Main craft type (0x00C5 for typical all range mode enemies. C6 / allies?. Anything else is level specfic. C3 intros only?)
+
+	addiu sp, sp, 0xFFAC		
+	sw ra, 0x0028(sp)
+	sw a0, 0x0020(sp)
+	sw a1, 0x001C(sp)
+	sw a2, 0x0024(sp)
+	lw s0, 0x0020(sp)
+	sw t0, 0x002C(sp)
+	sw t1, 0x0030(sp)
+	sw t2, 0x0034(sp)
+	sw t3, 0x0038(sp)
+	sw t4, 0x003C(sp)
+	sw t5, 0x0040(sp)
+	sw t6, 0x0044(sp)
+	sw t7, 0x0048(sp)
+	sw t8, 0x004C(sp)
+	sw v0, 0x0050(sp)
+	jal	0x8005cf54		;clear craft space
+	or a0, s0, r0
+	lw a2, 0x0024(sp)
+	sb a2, 0x0044(s0)
+	lw s4, 0x0038(sp)	;can be targeted
+	lw s1, 0x002C(sp)	;x
+	lw s2, 0x0030(sp)	;y
+	lw s3, 0x0034(sp)	;z
+	mtc1 s1, f4		;x
+	mtc1 s2, f6		;y
+	mtc1 s3, f7		;z
+	swc1 f4, 0x0004(s0)
+	swc1 f6, 0x0008(s0)
+	swc1 f7, 0x000C(s0)
+	li t6, 2	
+	sb t6, 0x0000(s0)		;state active	
+	li t7, 1		
+	sh t7, 0x00B8(s0)	;state of craft		
+	lw t8, 0x003C(sp)		
+	sh t8, 0x00E4(s0)		;craft model	
+	lw t9, 0x001C(sp)		
+	sh t9, 0x00E6(s0)		;craft to target
+	lw t0, 0x0040(sp)	
+	sh t0, 0x00B6(s0)		;toggles other models if craft model is 0xA+, otherwise laser type	
+	lw t1, 0x0044(sp)	
+	sh t1, 0x00CE(s0)	;health		
+	li t2, 1		
+	sw t2, 0x007C(s0)	;?		
+	li t3, 0		
+	sb t3, 0x00C9(s0)	;? 
+	li t4, 0x48	
+	sh t4, 0x00C2(s0)	;invulnerable timer	
+	lw a1, 0x0050(sp)			;Main craft type
+	addiu a0, s0, 0x1C			;+0x1C of ship space in memory
+	jal	0x8005ce48		
+	sh	a1, 0x0002(s0)		
+	mtc1 r0, f8			
+	li a3, 0x800c18b4	;engine sound address thingy?
+	li t5, 0x800c18bc	;engine sound address thingy?	
+	sw s4, 0x0038(s0)	;can be targeted					
+	addiu a1, s0, 0x100	;+0x100 of starting space
+	lw t0, 0x0048(sp)
+	sb t0, 0x003C(s0)		;hits when killed	
+	sw t5, 0x0014(sp)		
+	sw a3, 0x0010(sp)
+	lw a0, 0x004C(sp)	;engine sound
+	beq a0, r0, (@@NoEngineSound)
+	nop
+	jal	0x80019218	;set engine sound
+	li a2, 4
+@@NoEngineSound:
+	lw ra, 0x0028(sp)				
+	jr ra
+	addiu sp, sp, 0x0054	
+	nop
+	
+CheckShipDead:		;pass a0 as memory address of ship to check. Returns 1 in v0 if dead otherwise 0
+	lh v0, 0x0000(a0)
+	beq v0, r0, (@@IsDyingState)
+	li v0, 0
+	jr ra
+	nop
+@@IsDyingState:
+	lh v0, 0x00BE(a0)
+	li v1, 1
+	beql v0, v1, (@@IsDespawned)
+	li v0, 1
+	jr ra
+	li v0, 0
+	nop
+@@IsDespawned:
+	jr ra
+	nop
+	
+CheckShipDeadMissile:		;pass a0 as memory address of ship to check, a1 main craft ID to expect. Returns 1 in v0 if dead otherwise 0 for unknown
+	lh v0, 0x0002(a0)
+	bnel v0, a1, (@@UnknownState)
+	li v0, 0
+	lh v0, 0x0000(a0)
+	beql v0, r0, (@@IsDead)
+	li v0, 1
+	jr ra
+	li v0, 0
+	nop
+@@UnknownState:
+	jr ra
+	nop
+@@IsDead:
+	jr ra
+	nop
+	
+SpawnSingleMissileOrShipSpecial:		;pass a0 as the memory address to spawn in. a1 the craft ID to target(only 00 fox, 02 slippy, 03 peppy), a2 speed (float), a3 missile (0) or ship (1) that shoots. t0-t2 xyz starting pos
+
+	addiu sp, sp, 0xFFC0		
+	sw ra, 0x0028(sp)
+	sw a0, 0x0020(sp)
+	sw a1, 0x001C(sp)
+	sw a2, 0x002C(sp)
+	sw a3, 0x0024(sp)
+	sw a2, 0x0030(sp)
+	lw s0, 0x0020(sp)
+	sw t0, 0x0034(sp)
+	sw t1, 0x0038(sp)
+	sw t2, 0x003C(sp)
+	jal	0x8005cf54		;clear craft space
+	or a0, s0, r0
+	lw a1, 0x001C(sp)
+	sh a1, 0x0054(s0)
+	lui s4, 0x4250
+	lw s1, 0x0034(sp)
+	lw s2, 0x0038(sp)
+	lw s3, 0x003C(sp)
+	lw s5, 0x002C(sp)
+	mtc1 s1, f4		;x
+	mtc1 s2, f6		;y
+	mtc1 s3, f7		;z
+	mtc1 s5, f5		;speed
+	swc1 f4, 0x0004(s0)
+	swc1 f6, 0x0008(s0)
+	swc1 f7, 0x000C(s0)
+	swc1 f5, 0x0128(s0)
+	li t6, 2	
+	sb t6, 0x0000(s0)		;state active	
+	li t7, 1		
+	sh t7, 0x00B8(s0)	;state of craft		
+	lw t8, 0x0024(sp)	
+	sh t8, 0x00B4(s0)		;craft model	
+	lw t9, 0x001C(sp)		
+	sh t9, 0x0054(s0)		;craft to target
+	li t0, 0	
+	sh t0, 0x00B6(s0)		;toggles other models if craft model is 0xA +, other wise laser type	
+	li t1, 34		
+	sh t1, 0x00CE(s0)	;health		
+	li t2, 1		
+	sw t2, 0x007C(s0)	;?		
+	li t3, 0		
+	sb t3, 0x00C9(s0)	;? 
+	li t4, 0x36	
+	sh t4, 0x00C2(s0)	;invulnerable timer	
+	li a1, 0xBF			;must be in a1 to pass to function (level specfic object ID. BE = missle, BF as well)
+	addiu a0, s0, 0x1C			;+0x1C of ship space in memory
+	jal	0x8005ce48		
+	sh	a1, 0x0002(s0)		
+	mtc1 r0, f8		
+	;li at, 0x8015DF48		;starting space	
+	li a3, 0x800c18b4	
+	li t5, 0x800c18bc		
+	sw s4, 0x0038(s0)	;can be targeted		
+	;lui	at, 0x8016			
+	li a0, 0x31004005	;engine sound	
+	addiu a1, s0, 0x100	;+0x100 of starting space
+	li t0, 1
+	sb t0, 0x003C(s0)		;hits when killed	
+	sw t5, 0x0014(sp)		
+	sw a3, 0x0010(sp)		
+	;jal	0x80019218	;set engine sound
+	li a2, 4
+	lw ra, 0x0028(sp)				
+	jr ra
+	addiu sp, sp, 0x0040	
+	nop
 	
 SpawnBill:
 	addiu sp, sp, 0xffe0		
@@ -646,7 +873,5 @@ KillShip:		;kills ship in memory space from a0.
 	jr ra
 	sb v1, 0x0000(a0)
 	nop
-
-	
 	
 .endautoregion

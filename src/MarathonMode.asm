@@ -134,7 +134,16 @@ TBL_FUNC_MarathonMode:
 	beq s0, v1, (@@VETunnelsCheck)		;check if in tunnels
 	li v1, 0xB
 	beq s0, v1, (@@MacBethCheck)
+	li v1, 0xA
+	beq s0, v1, (@@TrainingModeSpecialStageCheck)
 	nop
+	j NextTableEntry
+	nop
+	
+@@TrainingModeSpecialStageCheck:
+	lw a0, (LOC_NUM_PLANETS_COMPLETED32)
+	bnel a0, r0, (@@Exit)
+	sw r0, orga(gMarathonModeAddToCompletedTimesFlag) (gp)	;if completed times not zero, assume special stage so unset completed times flag
 	j NextTableEntry
 	nop
 	

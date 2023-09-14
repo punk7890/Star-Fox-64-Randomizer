@@ -125,7 +125,13 @@ ChoosePlanetsPlanetScreenText:
 .asciiz "L TO CHANGE PLANET"
 .align 4,0
 ChoosePlanetsPlanetScreenText2:
-.asciiz "D-PAD UP VE2 D-PAD DOWN VE1"
+.asciiz "D-PAD UP VE2"
+.align 4,0
+ChoosePlanetsPlanetScreenText3:
+.asciiz "D-PAD DOWN VE1"
+.align 4,0
+ChoosePlanetsPlanetScreenText4:
+.asciiz "D-PAD LEFT BONUS STAGE"
 .align 4,0
 
 QuickScoreScreensText:
@@ -155,6 +161,15 @@ ProtectTheTargetsModeTimeText:
 .asciiz "PROTECT THE TARGETS"
 .align 4,0
 
+FalcoText:
+.asciiz "FAL"
+.align 4,0
+SlippyText:
+.asciiz "SLP"
+.align 4,0
+PeppyText:
+.asciiz "PEP"
+.align 4,0
 KattText:
 .asciiz "KATT"
 .align 4,0

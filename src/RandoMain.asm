@@ -470,18 +470,28 @@ TBL_FUNC_ChoosePlanets:		;allows the player to choose planets with L button at t
 	li a0, BUTTON_D_PAD_DOWN16
 	bne a0, t7, (@@CheckIfUp)
 	li.u a0, 0x00060007
-	jal DoSoftReset
+	jal DoSoftResetWithFlag
 	li.l a0, 0x00060007
 	b (NextTableEntry)
 	nop
 @@CheckIfUp:
 	li a0, BUTTON_D_PAD_UP16
-	bne a0, t7, (@@CheckIfL)
+	bne a0, t7, (@@CheckIfLeft)
 	li.u a0, 0x00130007
-	jal DoSoftReset
+	jal DoSoftResetWithFlag
 	li.l a0, 0x00130007
 	b (NextTableEntry)
 	nop
+@@CheckIfLeft:
+	lw v0, orga(gSpecialStageFlag) (gp)
+	beq v0, r0, (@@CheckIfL)
+	li a0, BUTTON_D_PAD_LEFT16
+	bne a0, t7, (@@CheckIfL)
+	li v0, 1
+	sw v0, orga(gSpecialStageChoosePlanetsFlag) (gp)
+	li.u a0, 0x000A0007
+	jal DoSoftResetWithFlag
+	li.l a0, 0x000A0007
 @@CheckIfL:
 	li a2, 0x437f
 	li a0, BUTTON_L16

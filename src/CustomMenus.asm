@@ -1404,6 +1404,50 @@ SUB_InGameText:		;function for displaying in-game text whenever. Can use at-t7 a
 	li a0, 0x12
 	jal @FUNC_RENDER_TEXT
 	li a1, 0x2E
+	
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_WHITE
+	sw t7, 0x0004(s0)
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, ChoosePlanetsPlanetScreenText3
+	sw t8, 0x0010(sp)
+	li a0, 0x12
+	jal @FUNC_RENDER_TEXT
+	li a1, 0x36
+	
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	lw v0, orga(gSpecialStageFlag) (gp)
+	beq v0, r0, (@@ChangeToRedChoosePlanets)
+	li t7, C_GREEN
+	b (@@ResumeChoosePlanets)
+	sw t7, 0x0004(s0)
+	
+@@ChangeToRedChoosePlanets:
+	li t7, C_RED
+	sw t7, 0x0004(s0)
+	
+@@ResumeChoosePlanets:
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, ChoosePlanetsPlanetScreenText4
+	sw t8, 0x0010(sp)
+	li a0, 0x12
+	jal @FUNC_RENDER_TEXT
+	li a1, 0x3E
+	
 @@Debugmodecheck:
 	lw v0, orga(gDebugModeFlag) (gp)
 	beq v0, r0, (CheckEnduranceMode)		;go to endurance mode check
@@ -2055,7 +2099,7 @@ ProtectTheShipsCheck:
 	
 BossRushRenderText:
 	lw at, orga(gBossRushModeFlag) (gp)
-	beq at, r0, (NextOption)
+	beq at, r0, (SpecialStageTextRender)
 	; lb v0, (LOC_HAS_CONTROL_FLAG8)
 	; bne v0, r0, (@BeginRender)
 	; lw v0, (LOC_SPECIAL_STATE)
@@ -2698,7 +2742,7 @@ BossRushRenderText:
 	
 @BRMDebugText:
 	lw v0, orga(gDebugModeFlag) (gp)
-	beq v0, r0, (NextOption)
+	beq v0, r0, (SpecialStageTextRender)
 	nop
 	li s6, @G_SETPRIMCOLOR
 	lw s0, 0x0000(s2)
@@ -2820,7 +2864,53 @@ BossRushRenderText:
 	jal @FUNC_RENDER_HEXTODEC
 	li a1, 0x50
 	
+SpecialStageTextRender:
+	lw v0, orga(gSpecialStageFlag) (gp)
+	beq v0, r0, (NextOption)
+	lw v0, (LOC_LEVEL_ID32)
+	li v1, 0xA
+	bne v0, v1, (NextOption)
+	lw a0, (LOC_ALIVE_TIMER32)
+	sltiu v0, a0, 255
+	bne v0, r0, (NextOption)
 	
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_WHITE
+	sw t7, 0x0004(s0)
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, FalcoText
+	sw t8, 0x0010(sp)
+	li a0, 0x8
+	jal @FUNC_RENDER_TEXT
+	li a1, 0x36
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	lw a2, (0x8016D724)	;falco health
+	ble a2, r0, (@@FALDead)
+	li t7, C_WHITE
+	b (@@FALContinue)
+	sw t7, 0x0004(s0)
+@@FALDead:
+	li t7, C_RED
+	or a2, r0, r0
+	b (@@FALContinue)
+	sw t7, 0x0004(s0)
+@@FALContinue:
+	jal @FUNC_HEXTODEC
+	or a0, a2, r0
+	li a0, 0x8
+	jal @FUNC_RENDER_HEXTODEC
+	li a1, 0x3E
 NextOption:
 	b (ExitInGameText)
 	nop

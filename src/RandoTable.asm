@@ -31,6 +31,7 @@ gRandoTable:	;always leave a zero after the last valid entry
 .d32 TBL_FUNC_EnduranceMode
 .d32 TBL_FUNC_ProtectTheTargetsMode
 .d32 TBL_FUNC_ExtraStarWolfs
+.d32 TBL_FUNC_SpecialStage
 .d32 0
 
 

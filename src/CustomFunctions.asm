@@ -177,22 +177,6 @@ CheckSameLevels:		;checks if the player completed a level they are about to go i
 	
 OrderPlanets:		;orders planets in planet screen based on the last completed planet and level ID. For whatever reason, these are different from actual level ID.
 
-		/* Planet icon ID defines */
-		@PLANET_METEO equ 0x0
-		@PLANET_A6 equ 0x1
-		@PLANET_BOLSE equ 0x2
-		@PLANET_SECTORZ equ 0x3
-		@PLANET_SECTORX equ 0x4
-		@PLANET_SECTORY equ 0x5
-		@PLANET_KATINA equ 0x6
-		@PLANET_MACBETH equ 0x7
-		@PLANET_ZONESS equ 0x8
-		@PLANET_CORNERIA equ 0x9
-		@PLANET_TITANIA equ 0xA
-		@PLANET_AQUAS equ 0xB
-		@PLANET_FORTUNA equ 0xC
-		@PLANET_VENOM equ 0xD
-		@PLANET_SOLOR equ 0xE
 
 	lui t0, 0x8017
 	lw a0, 0xD9B8(t0) ;LOC_NUM_PLANETS_COMPLETED32
@@ -201,7 +185,7 @@ OrderPlanets:		;orders planets in planet screen based on the last completed plan
 	lw a1, 0xE0A4(t0) ;LOC_LEVEL_ID32
 	li v0, 0x0
 	bne v0, a1, (@@Meteo)
-	li v0, @PLANET_CORNERIA
+	li v0, PLANET_CORNERIA
 	sw v0, 0xDA00(t2)
 @@Meteo:
 	li v0, 0x1
@@ -211,67 +195,67 @@ OrderPlanets:		;orders planets in planet screen based on the last completed plan
 @@SectorX:
 	li v0, 0x2
 	bne v0, a1, (@@Area6)
-	li v0, @PLANET_SECTORX
+	li v0, PLANET_SECTORX
 	sw v0, 0xDA00(t2)
 @@Area6:
 	li v0, 0x3
 	bne v0, a1, (@@SectorY)
-	li v0, @PLANET_A6
+	li v0, PLANET_A6
 	sw v0, 0xDA00(t2)
 @@SectorY:
 	li v0, 0x5
 	bne v0, a1, (@@Venom1Surface)
-	li v0, @PLANET_SECTORY
+	li v0, PLANET_SECTORY
 	sw v0, 0xDA00(t2)
 @@Venom1Surface:
 	li v0, 0x6
 	bne v0, a1, (@@Solor)
-	li v0, @PLANET_VENOM
+	li v0, PLANET_VENOM
 	sw v0, 0xDA00(t2)
 @@Solor:
 	li v0, 0x7
 	bne v0, a1, (@@Zoness)
-	li v0, @PLANET_SOLOR
+	li v0, PLANET_SOLOR
 	sw v0, 0xDA00(t2)
 @@Zoness:
 	li v0, 0x8
 	bne v0, a1, (@@MacBeth)
-	li v0, @PLANET_ZONESS
+	li v0, PLANET_ZONESS
 	sw v0, 0xDA00(t2)
 @@MacBeth:
 	li v0, 0xB
 	bne v0, a1, (@@Titania)
-	li v0, @PLANET_MACBETH
+	li v0, PLANET_MACBETH
 	sw v0, 0xDA00(t2)
 @@Titania:
 	li v0, 0xC
 	bne v0, a1, (@@Aquas)
-	li v0, @PLANET_TITANIA
+	li v0, PLANET_TITANIA
 	sw v0, 0xDA00(t2)
 @@Aquas:
 	li v0, 0xD
 	bne v0, a1, (@@Fortuna)
-	li v0, @PLANET_AQUAS
+	li v0, PLANET_AQUAS
 	sw v0, 0xDA00(t2)
 @@Fortuna:
 	li v0, 0xE
 	bne v0, a1, (@@Katina)
-	li v0, @PLANET_FORTUNA
+	li v0, PLANET_FORTUNA
 	sw v0, 0xDA00(t2)
 @@Katina:
 	li v0, 0x10
 	bne v0, a1, (@@Bolse)
-	li v0, @PLANET_KATINA
+	li v0, PLANET_KATINA
 	sw v0, 0xDA00(t2)
 @@Bolse:
 	li v0, 0x11
 	bne v0, a1, (@@SectorZ)
-	li v0, @PLANET_BOLSE
+	li v0, PLANET_BOLSE
 	sw v0, 0xDA00(t2)
 @@SectorZ:
 	li v0, 0x12
 	bne v0, a1, (@@End)
-	li v0, @PLANET_SECTORZ
+	li v0, PLANET_SECTORZ
 	sw v0, 0xDA00(t2)
 @@End:
 	jr ra
@@ -401,6 +385,13 @@ ClearPlayerFlagsAndStatsInGP:		;put all game related flags here for clearing. Th
 	sw t7, orga(gOldWingHealthL) (gp)
 	li t7, 0x0202
 	sw t7, orga(gOldWingStates) (gp)
+	sw r0, orga(gSpecialStageSuperWolfFlag) (gp)
+	sw r0, orga(gSpecialStageBombReadyTimer) (gp)
+	lw t7, orga(gSpecialStageRandomFlag) (gp)
+	xori t7, t7, 1
+	sw t7, orga(gSpecialStageRandomFlag) (gp)
+	sw r0, orga(gSpecialStageEndWaitTimer) (gp)
+	sw r0, orga(gSpecialStageChoosePlanetsFlag) (gp)
 	jr ra
 	nop
 	

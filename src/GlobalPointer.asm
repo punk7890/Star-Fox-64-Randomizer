@@ -8,11 +8,11 @@
 .region 0x8000	;No idea how to properly use all 64kb of global pointer space with this compiler, so it's limited to 32kb.
 
 GLOBAL_POINTER:		;top of global pointer
-.asciiz "2023-09-11 00:19:14"
+.asciiz "2023-09-13 15:13:55"
 .align 4,0
 
 gDebugModeFlag:		;enables a set of test features
-.d32 0
+.d32 1
 
 gDebugModeFreezeFrameFlag:		
 .d32 0
@@ -233,6 +233,29 @@ gCrashHandlerHookCreated:		;force crash handler screen if game crashed flag
 
 gEndScreenHookCreated:
 .d32 0
+
+gSpecialStageFlag:	;1 on (score unlock method), 2 random
+.d32 2
+gSpecialStageRandomFlag:
+.d32 0
+gSpecialStageSuperWolfFlag:
+.d32 0
+gSpecialStageBombReadyTimer:
+.d32 0
+gSpecialStageEndWaitTimer:
+.d32 0
+gSpecialStageChoosePlanetsFlag:
+.d32 0
+gSpecialStageBRMMarathonScore:	;total score for boss rush and marathon
+.d32 85000
+gSpecialStageBRMScore:	;total score for just boss rush
+.d32 50000
+gSpecialStageBRMBasicScore:	;fixed level score timer for completing the stage
+.d32 5000
+gSpecialStageMarathonScore: ;total score for just marathon
+.d32 2200
+gSpecialStageRegularScore:	;total score for regular game mode or random planets. 
+.d32 1000
 
 gBossRushModeFlag:
 .d32 0

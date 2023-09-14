@@ -49,6 +49,24 @@
 
 	.definelabel FUNC_PLANET_SELECTED, 0x8019C1D8		;Only loaded in planet screen.
 	
+/* Planet icon ID defines in map screen */
+
+	.definelabel PLANET_METEO, 0x0
+	.definelabel PLANET_A6, 0x1
+	.definelabel PLANET_BOLSE, 0x2
+	.definelabel PLANET_SECTORZ, 0x3
+	.definelabel PLANET_SECTORX, 0x4
+	.definelabel PLANET_SECTORY, 0x5
+	.definelabel PLANET_KATINA, 0x6
+	.definelabel PLANET_MACBETH, 0x7
+	.definelabel PLANET_ZONESS, 0x8
+	.definelabel PLANET_CORNERIA, 0x9
+	.definelabel PLANET_TITANIA, 0xA
+	.definelabel PLANET_AQUAS, 0xB
+	.definelabel PLANET_FORTUNA, 0xC
+	.definelabel PLANET_VENOM, 0xD
+	.definelabel PLANET_SOLOR, 0xE
+	
 /* Button defines */
 
 	.definelabel BUTTON_D_PAD_UP16, 0x0800
