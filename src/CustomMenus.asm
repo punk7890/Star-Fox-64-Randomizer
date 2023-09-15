@@ -6,7 +6,7 @@
 	/* Calls to code.	*/
 	@FUNC_GET_NEXT_RSP_FREE equ 0x800b4950		;gets next RSP area and signals a display list start
 	@FUNC_RENDER_TEXT equ 0x8009cd90
-	@FUNC_HEXTODEC equ 0x8008784c		;actually aligns text, not always needed
+	@FUNC_ALIGN_NUMBERS equ 0x8008784c		;aligns hex numbers
 	@FUNC_RENDER_HEXTODEC equ 0x8009ba30	;renders hex value in a2 to decimal
 	
 	/* Pointers */
@@ -94,7 +94,7 @@ SUB_MainMenuText:		;should be safe to use registers at - t7 whenever, just make 
 	mfc1 a2, f20
 	mfc1 a3, f20
 	lw a0, (LOC_POWER_ON_TIMER32)
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a2, a0, r0
 	li a0, 0x20
 	jal @FUNC_RENDER_HEXTODEC
@@ -1499,7 +1499,7 @@ SUB_InGameText:		;function for displaying in-game text whenever. Can use at-t7 a
 	jal CheckButtons
 	li a0, 0
 	or a2, v0, r0
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a0, v0, r0
 	li a0, 0xA
 	jal @FUNC_RENDER_HEXTODEC
@@ -1513,7 +1513,7 @@ SUB_InGameText:		;function for displaying in-game text whenever. Can use at-t7 a
 	li t7, C_WHITE
 	sw t7, 0x0004(s0)
 	lw a2, (LOC_ALIVE_TIMER32)
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a0, a2, r0
 	li a0, 0x112
 	jal @FUNC_RENDER_HEXTODEC
@@ -1527,7 +1527,7 @@ SUB_InGameText:		;function for displaying in-game text whenever. Can use at-t7 a
 	li t7, C_WHITE
 	sw t7, 0x0004(s0)
 	lw a2, (LOC_ALLRANGEMODE_TIMER)
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a0, a2, r0
 	li a0, 0x112
 	jal @FUNC_RENDER_HEXTODEC
@@ -1541,7 +1541,7 @@ SUB_InGameText:		;function for displaying in-game text whenever. Can use at-t7 a
 	li t7, C_BLUE
 	sw t7, 0x0004(s0)
 	lw a2, (LOC_CHECKPOINT_ALLRANGEMODE_FLAG)
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a0, a2, r0
 	li a0, 0x112
 	jal @FUNC_RENDER_HEXTODEC
@@ -1555,7 +1555,7 @@ SUB_InGameText:		;function for displaying in-game text whenever. Can use at-t7 a
 	li t7, C_BLUE
 	sw t7, 0x0004(s0)
 	lw a2, (LOC_CHECKPOINT_HITS32)
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a0, a2, r0
 	li a0, 0x112
 	jal @FUNC_RENDER_HEXTODEC
@@ -1569,7 +1569,7 @@ SUB_InGameText:		;function for displaying in-game text whenever. Can use at-t7 a
 	li t7, C_BLUE
 	sw t7, 0x0004(s0)
 	lw a2, (LOC_CHECKPOINT_SECTION_ID32)
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a0, a2, r0
 	li a0, 0x112
 	jal @FUNC_RENDER_HEXTODEC
@@ -1583,7 +1583,7 @@ SUB_InGameText:		;function for displaying in-game text whenever. Can use at-t7 a
 	li t7, C_WHITE
 	sw t7, 0x0004(s0)
 	lw a2, (LOC_LEVEL_SECTION_ID32)
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a0, a2, r0
 	li a0, 0x112
 	jal @FUNC_RENDER_HEXTODEC
@@ -1599,7 +1599,7 @@ SUB_InGameText:		;function for displaying in-game text whenever. Can use at-t7 a
 	jal CheckFoxState2	;check health
 	li a0, 0x0264
 	or a2, v0, r0
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a0, a2, r0
 	li a0, 0x20
 	jal @FUNC_RENDER_HEXTODEC
@@ -1616,7 +1616,7 @@ SUB_InGameText:		;function for displaying in-game text whenever. Can use at-t7 a
 	bltl a2, r0, (@@WingRZeroNotOverflow)
 	or a2, r0, r0
 @@WingRZeroNotOverflow:
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a0, a2, r0
 	li a0, 0x32
 	jal @FUNC_RENDER_HEXTODEC
@@ -1633,7 +1633,7 @@ SUB_InGameText:		;function for displaying in-game text whenever. Can use at-t7 a
 	bltl a2, r0, (@@WingLZeroNotOverflow)
 	or a2, r0, r0
 @@WingLZeroNotOverflow:
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a0, a2, r0
 	li a0, 0x20
 	jal @FUNC_RENDER_HEXTODEC
@@ -1839,7 +1839,7 @@ SUB_InGameText:		;function for displaying in-game text whenever. Can use at-t7 a
 	jal GetLevelID
 	nop
 	or a2, v0, r0
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a0, v0, r0
 	li a0, 0x110
 	jal @FUNC_RENDER_HEXTODEC
@@ -1927,7 +1927,7 @@ CheckEnduranceMode:		;check if flag is on for rendering text. Logic is in Endura
 	;li t7, C_WHITE		;change this for adding green, yellow and red based on nearing planet times
 	sw t7, 0x0004(s0)
 	;lw a2, orga(gEnduranceModeLevelTimer) (gp)
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a0, a2, r0
 	li a0, 0x106
 	jal @FUNC_RENDER_HEXTODEC
@@ -1982,7 +1982,7 @@ CheckEnduranceMode:		;check if flag is on for rendering text. Logic is in Endura
 @@ResumeWithColor:
 	sw t7, 0x0004(s0)
 	;lw a2, orga(gEnduranceModeCurrentTimer) (gp)
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a0, a2, r0
 	sll t1, v0, 3
 	li t2, 0xB0
@@ -2031,7 +2031,7 @@ ProtectTheShipsCheck:
 	li t7, C_WHITE	
 	sw t7, 0x0004(s0)
 	lhu a2, (0x8015BCA6)	;katthealth
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a0, a2, r0
 	li a0, 0x8
 	jal @FUNC_RENDER_HEXTODEC
@@ -2060,7 +2060,7 @@ ProtectTheShipsCheck:
 	li t7, C_WHITE	
 	sw t7, 0x0004(s0)
 	lhu a2, (0x8015B9B2)	;billhealth
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a0, a2, r0
 	li a0, 0x8
 	jal @FUNC_RENDER_HEXTODEC
@@ -2090,7 +2090,7 @@ ProtectTheShipsCheck:
 	li t7, C_WHITE	
 	sw t7, 0x0004(s0)
 	lw a2, (LOC_ALIVE_TIMER32)
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a0, a2, r0
 	li a0, 0x106
 	jal @FUNC_RENDER_HEXTODEC
@@ -2153,7 +2153,7 @@ BossRushRenderText:
 	li t7, C_WHITE	
 	sw t7, 0x0004(s0)
 	lw a2, orga(gTimerScoreToDisplay) (gp)	;score counter
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a0, a2, r0
 	sll v0, v0, 3
 	li v1, 0x93
@@ -2185,7 +2185,7 @@ BossRushRenderText:
 	li t7, C_WHITE	
 	sw t7, 0x0004(s0)
 	lw a2, orga(gTimerFinalScore) (gp)	;total score counter
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a0, a2, r0
 	sll v0, v0, 3
 	li v1, 0xE7
@@ -2221,7 +2221,7 @@ BossRushRenderText:
 	li t7, C_CYAN	
 	sw t7, 0x0004(s0)
 	lw a2, (0x8016D958)	;shield timer
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a0, a2, r0
 	sll v0, v0, 3
 	li v1, 0x120
@@ -2511,7 +2511,7 @@ BossRushRenderText:
 	li t7, C_WHITE	
 	sw t7, 0x0004(s0)
 	lw a2, orga(gBombCost) (gp)
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a0, a2, r0
 	sll v0, v0, 3
 	li v1, 0x110
@@ -2543,7 +2543,7 @@ BossRushRenderText:
 	li t7, C_WHITE	
 	sw t7, 0x0004(s0)
 	lw a2, orga(gLaserCost) (gp)
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a0, a2, r0
 	sll v0, v0, 3
 	li v1, 0x110
@@ -2575,7 +2575,7 @@ BossRushRenderText:
 	li t7, C_WHITE	
 	sw t7, 0x0004(s0)
 	lw a2, orga(gQuarterHealthCost) (gp)
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a0, a2, r0
 	sll v0, v0, 3
 	li v1, 0x110
@@ -2607,7 +2607,7 @@ BossRushRenderText:
 	li t7, C_WHITE	
 	sw t7, 0x0004(s0)
 	lw a2, orga(gHalfHealthCost) (gp)
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a0, a2, r0
 	sll v0, v0, 3
 	li v1, 0x110
@@ -2639,7 +2639,7 @@ BossRushRenderText:
 	li t7, C_WHITE	
 	sw t7, 0x0004(s0)
 	lw a2, orga(g1upCost) (gp)
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a0, a2, r0
 	sll v0, v0, 3
 	li v1, 0x110
@@ -2671,7 +2671,7 @@ BossRushRenderText:
 	li t7, C_WHITE	
 	sw t7, 0x0004(s0)
 	lw a2, orga(gRepairCost) (gp)
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a0, a2, r0
 	sll v0, v0, 3
 	li v1, 0x110
@@ -2703,7 +2703,7 @@ BossRushRenderText:
 	li t7, C_WHITE	
 	sw t7, 0x0004(s0)
 	lw a2, orga(gShieldCost) (gp)
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a0, a2, r0
 	sll v0, v0, 3
 	li v1, 0x110
@@ -2752,7 +2752,7 @@ BossRushRenderText:
 	li t7, C_RED	
 	sw t7, 0x0004(s0)
 	lw a2, (LOC_PLAYER_HITS32)	;level hits
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a0, a2, r0
 	sll v0, v0, 3
 	li v1, 0x93
@@ -2768,7 +2768,7 @@ BossRushRenderText:
 	li t7, C_RED	
 	sw t7, 0x0004(s0)
 	lw a2, (LOC_PLAYER_TOTAL_HITS32)	;total score
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a0, a2, r0
 	sll v0, v0, 3
 	li v1, 0x93
@@ -2800,7 +2800,7 @@ BossRushRenderText:
 	li t7, C_WHITE	
 	sw t7, 0x0004(s0)
 	lw a2, orga(gLastTimerVenoms) (gp)	;last VE timers
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a0, a2, r0
 	sll v0, v0, 3
 	li v1, 0x130
@@ -2856,7 +2856,7 @@ BossRushRenderText:
 	li t7, C_WHITE	
 	sw t7, 0x0004(s0)
 	lw a2, orga(gLastAND2Timer) (gp)	;last AND2 timer
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a0, a2, r0
 	sll v0, v0, 3
 	li v1, 0x130
@@ -2870,9 +2870,43 @@ SpecialStageTextRender:
 	lw v0, (LOC_LEVEL_ID32)
 	li v1, 0xA
 	bne v0, v1, (NextOption)
+	lui t0, 0x8017
+	lw a0, 0xD9B8(t0) ;LOC_NUM_PLANETS_COMPLETED32
+	lw v0, orga(gSpecialStageChoosePlanetsFlag) (gp)
+	bne v0, r0, (@@BypassPlanetsDoneCheck)
+	nop
+	beq a0, r0, (NextOption)
+@@BypassPlanetsDoneCheck:
 	lw a0, (LOC_ALIVE_TIMER32)
 	sltiu v0, a0, 255
 	bne v0, r0, (NextOption)
+	lw a0, orga(gSpecialStageEndWaitTimer) (gp)
+	beq a0, r0, (@@InEnding)
+	nop
+	b (@@BeginRenderSpecialStage)
+	nop
+@@InEnding:
+	lb v0, (LOC_ENDSCREEN_FLAG8)
+	bne v0, r0, (@@BeginRenderSpecialStage)
+	nop
+	b (@@BeginRenderSpecialStage)
+	nop
+	
+@@BeginRenderSpecialStage:
+	; debug
+	; li s6, @G_SETPRIMCOLOR
+	; lw s0, 0x0000(s2)
+	; sw s6, 0x0000(s0)
+	; addiu t6, s0, 0x0008
+	; sw t6, 0x0000(s2)
+	; li t7, C_WHITE
+	; sw t7, 0x0004(s0)
+	; lw a2, (LOC_ALIVE_TIMER32)
+	; jal @FUNC_ALIGN_NUMBERS
+	; or a0, a2, r0
+	; li a0, 0x112
+	; jal @FUNC_RENDER_HEXTODEC
+	; li a1, 0xC6
 	
 	li s6, @G_SETPRIMCOLOR
 	lw s0, 0x0000(s2)
@@ -2906,11 +2940,361 @@ SpecialStageTextRender:
 	b (@@FALContinue)
 	sw t7, 0x0004(s0)
 @@FALContinue:
-	jal @FUNC_HEXTODEC
+	jal @FUNC_ALIGN_NUMBERS
 	or a0, a2, r0
 	li a0, 0x8
 	jal @FUNC_RENDER_HEXTODEC
 	li a1, 0x3E
+	
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_WHITE
+	sw t7, 0x0004(s0)
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, SlippyText
+	sw t8, 0x0010(sp)
+	li a0, 0x8
+	jal @FUNC_RENDER_TEXT
+	li a1, 0x46
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	lw a2, (0x8016D728)	;slippy health
+	ble a2, r0, (@@SLPDead)
+	li t7, C_WHITE
+	b (@@SLPContinue)
+	sw t7, 0x0004(s0)
+@@SLPDead:
+	li t7, C_RED
+	or a2, r0, r0
+	b (@@SLPContinue)
+	sw t7, 0x0004(s0)
+@@SLPContinue:
+	jal @FUNC_ALIGN_NUMBERS
+	or a0, a2, r0
+	li a0, 0x8
+	jal @FUNC_RENDER_HEXTODEC
+	li a1, 0x4E
+	
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_WHITE
+	sw t7, 0x0004(s0)
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, PeppyText
+	sw t8, 0x0010(sp)
+	li a0, 0x8
+	jal @FUNC_RENDER_TEXT
+	li a1, 0x56
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	lw a2, (0x8016D728)	;peppy health
+	ble a2, r0, (@@PEPDead)
+	li t7, C_WHITE
+	b (@@PEPContinue)
+	sw t7, 0x0004(s0)
+@@PEPDead:
+	li t7, C_RED
+	or a2, r0, r0
+	b (@@PEPContinue)
+	sw t7, 0x0004(s0)
+@@PEPContinue:
+	jal @FUNC_ALIGN_NUMBERS
+	or a0, a2, r0
+	li a0, 0x8
+	jal @FUNC_RENDER_HEXTODEC
+	li a1, 0x5E
+	
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_WHITE
+	sw t7, 0x0004(s0)
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, KattText
+	sw t8, 0x0010(sp)
+	li a0, 0x8
+	jal @FUNC_RENDER_TEXT
+	li a1, 0x66
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	lh a2, (0x8015AAEE)	;katt health
+	ble a2, r0, (@@KATTDead)
+	li t7, C_WHITE
+	b (@@KATTContinue)
+	sw t7, 0x0004(s0)
+@@KATTDead:
+	li t7, C_RED
+	or a2, r0, r0
+	b (@@KATTContinue)
+	sw t7, 0x0004(s0)
+@@KATTContinue:
+	jal @FUNC_ALIGN_NUMBERS
+	or a0, a2, r0
+	li a0, 0x8
+	jal @FUNC_RENDER_HEXTODEC
+	li a1, 0x6E
+	
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_WHITE
+	sw t7, 0x0004(s0)
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, BillText
+	sw t8, 0x0010(sp)
+	li a0, 0x8
+	jal @FUNC_RENDER_TEXT
+	li a1, 0x76
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	lh a2, (0x8015ADE2)	;bill health
+	ble a2, r0, (@@BILLDead)
+	li t7, C_WHITE
+	b (@@BILLContinue)
+	sw t7, 0x0004(s0)
+@@BILLDead:
+	li t7, C_RED
+	or a2, r0, r0
+	b (@@BILLContinue)
+	sw t7, 0x0004(s0)
+@@BILLContinue:
+	jal @FUNC_ALIGN_NUMBERS
+	or a0, a2, r0
+	li a0, 0x8
+	jal @FUNC_RENDER_HEXTODEC
+	li a1, 0x7E
+	
+	;super wolf
+	lw v0, (0x80160E88)	;was spawned check
+	li v1, 0x020000C5
+	beq v0, v1, (@@IsAliveSWolf)
+	li v1, 0x030000C5
+	beq v0, v1, (@@IsAliveSWolf)
+	nop
+	b (@@AliveSWolf2Check)
+	nop
+@@IsAliveSWolf:
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	lh a2, (0x80160F56)	;swolf health
+	ble a2, r0, (@@SWOLFDead1)
+	li t7, C_YELLOW
+	b (@@SWOLFContinue1)
+	sw t7, 0x0004(s0)
+@@SWOLFDead1:
+	li t7, C_RED
+	b (@@SWOLFContinue1)
+	sw t7, 0x0004(s0)
+@@SWOLFContinue1:
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, SuperWolfText
+	sw t8, 0x0010(sp)
+	li a0, 0xF8
+	jal @FUNC_RENDER_TEXT
+	li a1, 0x42
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	lh a2, (0x80160F56)	;swolf health
+	ble a2, r0, (@@SWOLFDead2)
+	li t7, C_WHITE
+	b (@@SWOLFContinue2)
+	sw t7, 0x0004(s0)
+@@SWOLFDead2:
+	li t7, C_RED
+	or a2, r0, r0
+	b (@@SWOLFContinue2)
+	sw t7, 0x0004(s0)
+@@SWOLFContinue2:
+	jal @FUNC_ALIGN_NUMBERS
+	or a0, a2, r0
+	sll v0, v0, 3
+	li v1, 0x120
+	subu a0, v1, v0
+	jal @FUNC_RENDER_HEXTODEC
+	li a1, 0x4B
+	
+@@AliveSWolf2Check:
+	lw v0, (0x8016117C)	;was spawned check
+	li v1, 0x020000C5
+	beq v0, v1, (@@IsAliveSWolf2)
+	li v1, 0x030000C5
+	beq v0, v1, (@@IsAliveSWolf2)
+	nop
+	b (@@AliveSWolf3Check)
+	nop
+	
+@@IsAliveSWolf2:
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	lh a2, (0x8016124A)	;swolf health
+	ble a2, r0, (@@SWOLFDead3)
+	li t7, C_YELLOW
+	b (@@SWOLFContinue3)
+	sw t7, 0x0004(s0)
+@@SWOLFDead3:
+	li t7, C_RED
+	b (@@SWOLFContinue3)
+	sw t7, 0x0004(s0)
+@@SWOLFContinue3:
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, SuperWolfText
+	sw t8, 0x0010(sp)
+	li a0, 0xF8
+	jal @FUNC_RENDER_TEXT
+	li a1, 0x54
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	lh a2, (0x8016124A)	;swolf health
+	ble a2, r0, (@@SWOLFDead4)
+	li t7, C_WHITE
+	b (@@SWOLFContinue4)
+	sw t7, 0x0004(s0)
+@@SWOLFDead4:
+	li t7, C_RED
+	or a2, r0, r0
+	b (@@SWOLFContinue4)
+	sw t7, 0x0004(s0)
+@@SWOLFContinue4:
+	jal @FUNC_ALIGN_NUMBERS
+	or a0, a2, r0
+	sll v0, v0, 3
+	li v1, 0x120
+	subu a0, v1, v0
+	jal @FUNC_RENDER_HEXTODEC
+	li a1, 0x5D
+	
+@@AliveSWolf3Check:
+	lw v0, (0x80161470)	;was spawned check
+	li v1, 0x020000C5
+	beq v0, v1, (@@IsAliveSWolf3)
+	li v1, 0x030000C5
+	beq v0, v1, (@@IsAliveSWolf3)
+	nop
+	b (@@BombReadyCheck)
+	nop
+	
+@@IsAliveSWolf3:
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	lh a2, (0x8016153E)	;swolf health
+	ble a2, r0, (@@SWOLFDead5)
+	li t7, C_YELLOW
+	b (@@SWOLFContinue5)
+	sw t7, 0x0004(s0)
+@@SWOLFDead5:
+	li t7, C_RED
+	b (@@SWOLFContinue5)
+	sw t7, 0x0004(s0)
+@@SWOLFContinue5:
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, SuperWolfText
+	sw t8, 0x0010(sp)
+	li a0, 0xF8
+	jal @FUNC_RENDER_TEXT
+	li a1, 0x66
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	lh a2, (0x8016153E)	;swolf health
+	ble a2, r0, (@@SWOLFDead6)
+	li t7, C_WHITE
+	b (@@SWOLFContinue6)
+	sw t7, 0x0004(s0)
+@@SWOLFDead6:
+	li t7, C_RED
+	or a2, r0, r0
+	b (@@SWOLFContinue6)
+	sw t7, 0x0004(s0)
+@@SWOLFContinue6:
+	jal @FUNC_ALIGN_NUMBERS
+	or a0, a2, r0
+	sll v0, v0, 3
+	li v1, 0x120
+	subu a0, v1, v0
+	jal @FUNC_RENDER_HEXTODEC
+	li a1, 0x6F
+	
+@@BombReadyCheck:
+	lw v0, orga(gSpecialStageBombReadyTimer) (gp)
+	li v1, 500
+	bne v0, v1, (NextOption)
+	li s6, @G_SETPRIMCOLOR
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	li t7, C_GREEN
+	sw t7, 0x0004(s0)
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, NukeText
+	sw t8, 0x0010(sp)
+	li a0, 0xE0
+	jal @FUNC_RENDER_TEXT
+	li a1, 0x88
+	
 NextOption:
 	b (ExitInGameText)
 	nop

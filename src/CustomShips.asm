@@ -13,7 +13,7 @@
 	; 0x24 32bit address to logic function. Starwolfs is 0x8002D53C
 	; 0x38 Can be targeted (float)
 	; 0x3C byte for how many hits if killed
-	; 0x44 byte drops item. 01 silver, 02 silver but random?, 05 bomb, 9 laser, D 1up E gold ring
+	; 0x44 byte drops item. 01 silver, 02 silver but random?, 05 bomb, 9 laser, 0xD 1up 0xE gold ring 0x17 repair 0x19 star
 	; 0xB6 half Type of Craft / laser type (reserved for certain IDs). 0003 shielded enemy. same as 00 but shielded. 
 	; Below model IDS 0xA:
 	; 00 red laser, 
@@ -29,6 +29,7 @@
 	; 0x70 word (also state of craft? starts out as 1)
 	; 0xC2 half Invincable timer 
 	; 0xC9 ?
+	; 0xCA byte if locked on
 	; 0xCE half Health (only for C5?)
 	; 0xD6 half damage to take
 	; 0xE4 half Sub craft model / function ID lookup (if C5). common table at 800311DC. If A or over, takes model ID in 0xB6
@@ -159,6 +160,37 @@ CheckShipDeadMissile:		;pass a0 as memory address of ship to check, a1 main craf
 @@IsDead:
 	jr ra
 	nop
+	
+LockOnScan:		;pass memory address to scan a 0x00C5 main craft type and missiles (0x00BE, BF) 
+				;and see if it is locked on by Fox. 
+				;Pass a1 for the ending range to stop scanning. 
+				;Returns if a0 memory space is locked on to 1 in v0 and last memory space of craft checked in v1
+
+	li v1, 0x02F4
+	or t0, a0, r0
+@@Loop:
+	bgeu t0, a1, (@@False)
+	lb v0, 0x00CA(t0)
+	li t1, 0x02	;is homing to target with bomb
+	beq v0, t1, (@@True)
+	li t1, 0x14	;is locked on but not fired
+	beq v0, t1, (@@True)
+	nop
+	b (@@Loop)
+	addu t0, v1, t0
+	nop
+@@True:
+	or v1, t0, r0
+	jr ra
+	li v0, 1
+	nop
+@@False:
+	or v1, t0, r0
+	jr ra
+	li v0, 0
+	nop
+	
+	
 	
 SpawnSingleMissileOrShipSpecial:		;pass a0 as the memory address to spawn in. a1 the craft ID to target(only 00 fox, 02 slippy, 03 peppy), a2 speed (float), a3 missile (0) or ship (1) that shoots. t0-t2 xyz starting pos
 

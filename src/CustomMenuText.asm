@@ -176,6 +176,12 @@ KattText:
 BillText:
 .asciiz "BILL"
 .align 4,0
+SuperWolfText:
+.asciiz "S-WOLF"
+.align 4,0
+NukeText:
+.asciiz "NUKE ON L"
+.align 4,0
 
 BossRushModeText:
 .asciiz "BOSS RUSH MODE"

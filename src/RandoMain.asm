@@ -6,7 +6,7 @@
 
 .org 0x80410000		;main entry to function. Hardcoded to this offset.
 
-.region 0x4000 ;increase this if need more space in the future
+.region 0x8000 ;increase this if need more space in the future
 
 
 @@BeginRando:
@@ -268,6 +268,8 @@ SUB_CustomEndScreenHook:	;level end screen custom function. Runs twice when on-s
 	li a2, 0x11
 	beq a2, t7, (@@Exit)
 	li a2, 0x13
+	beq a2, t7, (@@Exit)
+	li a2, 0xA
 	beq a2, t7, (@@Exit)
 	li a2, 0x5
 	beq a2, v0, (@@DoReset)

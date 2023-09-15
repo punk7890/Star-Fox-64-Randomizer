@@ -274,7 +274,7 @@ CheckFoxState:	;returns a valid state in v0, otherwise returns -1.
 			jr ra
 			nop
 			
-CheckFoxState2:		;returns state in v0. Pass memory address based on Fox pointer to check in a0 (16 bit).
+CheckFoxState2:		;returns state in v0 (32 bit value). Pass memory address based on Fox pointer to check in a0 (16 bit value).
 
 	lw t0, (LOC_FOX_POINTER32)
 	beq t0, r0, (@@End)
@@ -386,12 +386,21 @@ ClearPlayerFlagsAndStatsInGP:		;put all game related flags here for clearing. Th
 	li t7, 0x0202
 	sw t7, orga(gOldWingStates) (gp)
 	sw r0, orga(gSpecialStageSuperWolfFlag) (gp)
+	sw r0, orga(gSpecialStageSuperWolfFlag2) (gp)
+	sw r0, orga(gSpecialStageSuperWolfFlag3) (gp)
 	sw r0, orga(gSpecialStageBombReadyTimer) (gp)
 	lw t7, orga(gSpecialStageRandomFlag) (gp)
 	xori t7, t7, 1
 	sw t7, orga(gSpecialStageRandomFlag) (gp)
 	sw r0, orga(gSpecialStageEndWaitTimer) (gp)
 	sw r0, orga(gSpecialStageChoosePlanetsFlag) (gp)
+	la t7, 0x800C7184	;load address to training mode ROM assets
+	sw r0, 0x0080(t7)
+	sw r0, 0x0084(t7)	;remove bill/katt assets from training
+	sw r0, 0x0088(t7)
+	sw r0, 0x008C(t7)	;remove Great Fox assets from training
+	lw t7, (HOOK_CheckIfModeAOnTraining)
+	sw t7, 0x80031804
 	jr ra
 	nop
 	
