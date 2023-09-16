@@ -8,7 +8,7 @@
 .region 0x8000	;No idea how to properly use all 64kb of global pointer space with this compiler, so it's limited to 32kb.
 
 GLOBAL_POINTER:		;top of global pointer
-.asciiz "2023-09-15 17:18:57"
+.asciiz "2023-09-15 21:45:58"
 .align 4,0
 
 gDebugModeFlag:		;enables a set of test features
@@ -257,7 +257,7 @@ gSpecialStageBRMScore:	;total score for just boss rush
 gSpecialStageBRMBasicScore:	;fixed level score timer for completing the stage
 .d32 5000
 gSpecialStageMarathonScore: ;total score for just marathon
-.d32 2200
+.d32 2500
 gSpecialStageRegularScore:	;total score for regular game mode or random planets. 
 .d32 1000
 
@@ -658,7 +658,7 @@ gRandomizerPage1MaxOptions:
 gRandomizerPage2MaxOptions:
 .d32 0
 gRandomizerPage3MaxOptions:
-.d32 4
+.d32 5
 gRandomizerPage4MaxOptions:
 .d32 7
 gMenuCursorValue:		;randomizer menu cursor value

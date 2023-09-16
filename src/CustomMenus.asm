@@ -767,6 +767,24 @@ SpecialModesPage1:
 	li a0, @CENTER_A0
 	jal @FUNC_RENDER_TEXT
 	li a1, @CENTER_MENU_ITEM_4_A1
+	
+	li s6, @G_SETPRIMCOLOR		;menu option 4 start
+	lw s0, 0x0000(s2)
+	sw s6, 0x0000(s0)
+	addiu t6, s0, 0x0008
+	sw t6, 0x0000(s2)
+	lw t7, orga(gUserMenuColorValue) (gp)
+	sw t7, 0x0004(s0)
+	li at, @DEFAULT_TEXT_SIZE
+	mtc1 at, f20
+	mfc1 a2, f20
+	mfc1 a3, f20
+	li t8, SpecialStageText
+	sw t8, 0x0010(sp)
+	li a0, @CENTER_A0
+	jal @FUNC_RENDER_TEXT
+	li a1, @CENTER_MENU_ITEM_5_A1
+	
 	lw a0, orga(gMenuCursorValue) (gp)
 	lw a1, orga(gRandomizerPage3MaxOptions) (gp)
 	sltu v0, a0, a1
@@ -836,8 +854,8 @@ SpecialModesPage1:
 	beq a0, v0, (@@RandomOptionsPage3Option2)
 	li v0, 3
 	beq a0, v0, (@@RandomOptionsPage3Option3)
-	; li v0, 4
-	; beq a0, v0, (@@RandomOptionsPage1Option4)
+	li v0, 4
+	beq a0, v0, (@@RandomOptionsPage3Option4)
 	; li v0, 5
 	; beq a0, v0, (@@RandomOptionsPage1Option5)
 	; li v0, 6
@@ -891,6 +909,20 @@ SpecialModesPage1:
 	xori a0, a0, 1
 	b (@@RenderOnOffText)
 	sw a0, orga(gBossRushModeFlag) (gp)
+	nop
+	
+@@RandomOptionsPage3Option4:
+	lw a0, orga(gSpecialStageFlag) (gp)
+	addiu a0, a0, 1
+	sltiu v0, a0, 3
+	beql v0, r0, (@@TurnOffSpecialMode)
+	sw v0, orga(gSpecialStageFlag) (gp)
+	b (@@RenderOnOffText)
+	sw a0, orga(gSpecialStageFlag) (gp)
+	nop
+@@TurnOffSpecialMode:
+	b (@@RenderOnOffText)
+	nop
 	
 @@RenderOnOffText:
 
@@ -925,7 +957,47 @@ SpecialModesPage1:
 		li a1, @CENTER_MENU_ITEM_4_A1
 		jal PrintOnOffText
 		sw a1, orga(gYposToRender) (gp)
-
+		
+		lw a0, orga(gSpecialStageFlag) (gp)
+		li v0, 0
+		beq a0, v0, (@@SpecialStageOffOn)
+		li v0, 1
+		beq a0, v0, (@@SpecialStageOffOn)
+		li v0, 2
+		beq a0, v0, (@@SpecialStageRandom)
+		nop
+		b (@@NextOption)
+		nop
+		
+@@SpecialStageOffOn:
+		li v0, gSpecialStageFlag
+		sw v0, orga(gOnOffLocationToRender) (gp)
+		li a0, @CENTER_MENU_ITEM_OFF_A0
+		sw a0, orga(gXposToRender) (gp)
+		li a1, @CENTER_MENU_ITEM_5_A1
+		jal PrintOnOffText
+		sw a1, orga(gYposToRender) (gp)
+		b (@@NextOption)
+		nop
+@@SpecialStageRandom:	
+		li s6, @G_SETPRIMCOLOR
+		lw s0, 0x0000(s2)
+		sw s6, 0x0000(s0)
+		addiu t6, s0, 0x0008
+		sw t6, 0x0000(s2)
+		li t7, C_CYAN
+		sw t7, 0x0004(s0)
+		li at, @DEFAULT_TEXT_SIZE
+		mtc1 at, f20
+		mfc1 a2, f20
+		mfc1 a3, f20
+		li t8, SpecialStageRandomText
+		sw t8, 0x0010(sp)
+		li a0, @CENTER_MENU_ITEM_OFF_A0
+		jal @FUNC_RENDER_TEXT
+		li a1, @CENTER_MENU_ITEM_5_A1
+		
+@@NextOption:
 		b (ExitRandomizerMenu)
 		nop
 		

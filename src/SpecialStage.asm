@@ -15,8 +15,6 @@ TBL_FUNC_SpecialStage:
 	beq v0, r0, (@@Exit)
 	lui t0, 0x8017
 	lw a0, 0xD9B8(t0) 	;LOC_NUM_PLANETS_COMPLETED32
-	; addiu a0, a0, -1	;subtract 1 completed time since a6/bolse auto
-						; ;adds completed times on the last few frames when the levels are ending. 
 	sll t1, a0, 2
 	addu t1, t1, t0
 	lw s7, 0xDA00(t1)	;get last planet completed by game logic (map screen planet IDs).
@@ -214,7 +212,13 @@ TBL_FUNC_SpecialStage:
 	sw a0, orga(gSpecialStageEndWaitTimer) (gp)
 	sltiu v0, a0, 250
 	bne v0, r0, (@@Exit)	;wait 250 frames
-	nop
+	lui t0, 0x8017
+	lw a0, 0xD9B8(t0) 	;LOC_NUM_PLANETS_COMPLETED32
+	addiu a0, a0, -1	;subtract 1 completed time since a6/bolse auto
+						;adds completed times on the last few frames when the levels are ending. 
+	sll t1, a0, 2
+	addu t1, t1, t0
+	lw s7, 0xDA00(t1)	;get last planet completed by game logic (map screen planet IDs).
 	li v0, PLANET_BOLSE
 	beq s7, v0, (@@WarpToVE1)
 	li v0, PLANET_A6
@@ -282,6 +286,13 @@ TBL_FUNC_SpecialStage:
 	nop
 	
 @@FindPlanet:
+	lui t0, 0x8017
+	lw a0, 0xD9B8(t0) 	;LOC_NUM_PLANETS_COMPLETED32
+	addiu a0, a0, -1	;subtract 1 completed time since a6/bolse auto
+						;adds completed times on the last few frames when the levels are ending. 
+	sll t1, a0, 2
+	addu t1, t1, t0
+	lw s7, 0xDA00(t1)	;get last planet completed by game logic (map screen planet IDs).
 	li v0, PLANET_BOLSE
 	beq s7, v0, (@@DeadGoingToVE1)
 	li v0, PLANET_A6
@@ -396,6 +407,22 @@ TBL_FUNC_SpecialStage:
 	li v0, 255
 	bne s7, v0, (@@CheckForRespawn)
 	;init all range mode starts
+	li v0, 0x0303
+	sh v0, (0x80157900)	;give player double health
+	la v1, LOC_PLAYER_LASER8
+	li at, 1
+	lb a0, 0x0000(v1)
+	sltiu v0, a0, 2
+	bnel v0, r0, (@@GiveBombs)
+	sb at, 0x0000(v1)	;give player twin lasers if not hypers
+@@GiveBombs:
+	la v1, LOC_PLAYER_BOMBS8
+	li at, 5
+	lb a0, 0x0000(v1)
+	sltiu v0, a0, 6
+	bnel v0, r0, (@@FalcoSpawn)
+	sb at, 0x0000(v1)	;give player 5 bombs if not over 5 already
+@@FalcoSpawn:
 	lui at, 0x8017
 	lw v0, 0xD724(at)	;falco health
 	ble v0, r0, (@@SlippySpawn)
@@ -1283,7 +1310,7 @@ TBL_FUNC_SpecialStage:
 @@SuperWolfAliveCheck3:
 	lh v0, (0x80161470)
 	li v1, 0x0200
-	bne v1, v0, (@@TimerEndingCheck)
+	bne v1, v0, (@@CheckForDeadSuperWolfs)
 	la t0, 0x80161470	;super wolf mem space
 	lw v0, (LOC_EXPERT_FLAG32)
 	bne v0, r0, (@@SuperWolfExpertStates3)
@@ -1293,7 +1320,7 @@ TBL_FUNC_SpecialStage:
 	li v0, 0x42400000
 	sw v0, 0x0118(t0)	;speed
 	li v0, 0x40480000
-	b (@@TimerEndingCheck)
+	b (@@CheckForDeadSuperWolfs)
 	sw v0, 0x0188(t0)	;back engine amount
 @@SuperWolfExpertStates3:
 	li v0, 0x40140000
@@ -1302,6 +1329,49 @@ TBL_FUNC_SpecialStage:
 	sw v0, 0x0118(t0)	;speed
 	li v0, 0x404E0000
 	sw v0, 0x0188(t0)	;back engine amount
+	
+@@CheckForDeadSuperWolfs:	;check if dying to apply special fx
+	la at, 0x80160E88
+	lb v0, 0x0000(at)
+	li v1, 3
+	bne v1, v0, (@@CheckForDeadSuperWolf2)
+	lh v0, 0x00BE(at)
+	li v1, 2
+	bne v1, v0, (@@CheckForDeadSuperWolf2)
+	or a0, at, r0
+	jal GrabObjectCoordinates
+	nop
+	li a0, 20.0
+	jal PlaceSpecialEffect
+	li t0, 0x017F
+@@CheckForDeadSuperWolf2:
+	la at, 0x8016117C
+	lb v0, 0x0000(at)
+	li v1, 3
+	bne v1, v0, (@@CheckForDeadSuperWolf3)
+	lh v0, 0x00BE(at)
+	li v1, 2
+	bne v1, v0, (@@CheckForDeadSuperWolf3)
+	or a0, at, r0
+	jal GrabObjectCoordinates
+	nop
+	li a0, 20.0
+	jal PlaceSpecialEffect
+	li t0, 0x017F
+@@CheckForDeadSuperWolf3:
+	la at, 0x80161470
+	lb v0, 0x0000(at)
+	li v1, 3
+	bne v1, v0, (@@TimerEndingCheck)
+	lh v0, 0x00BE(at)
+	li v1, 2
+	bne v1, v0, (@@TimerEndingCheck)
+	or a0, at, r0
+	jal GrabObjectCoordinates
+	nop
+	li a0, 20.0
+	jal PlaceSpecialEffect
+	li t0, 0x017F
 	
 @@TimerEndingCheck:
 	sltiu v0, s7, 300

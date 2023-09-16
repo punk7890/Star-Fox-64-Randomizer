@@ -190,6 +190,13 @@ LockOnScan:		;pass memory address to scan a 0x00C5 main craft type and missiles 
 	li v0, 0
 	nop
 	
+GrabObjectCoordinates:	;pass starting memory address of craft / object to grab xyz coords from. xyz returns in a1-a3
+	lw a1, 0x0004(a0)
+	lw a2, 0x0008(a0)
+	jr ra
+	lw a3, 0x000C(a0)
+	nop
+	
 PlaceSpecialEffect:		;a0 = size, a1-a3 xyz coords to spawn at, t0 = what object to spawn (0x017F boss explosion)
 
 	/* Calls to code.	*/

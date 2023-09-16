@@ -146,6 +146,13 @@ MarathonModeText:
 .asciiz "MARATHON MODE"
 .align 4,0
 
+SpecialStageText:
+.asciiz "BONUS STAGE"
+.align 4,0
+SpecialStageRandomText:
+.asciiz "RAN"
+.align 4,0
+
 ExtraStarWolfsText:
 .asciiz "EXTRA STAR WOLFS"
 .align 4,0
