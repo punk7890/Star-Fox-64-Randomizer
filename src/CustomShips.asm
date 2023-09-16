@@ -190,7 +190,101 @@ LockOnScan:		;pass memory address to scan a 0x00C5 main craft type and missiles 
 	li v0, 0
 	nop
 	
+PlaceSpecialEffect:		;a0 = size, a1-a3 xyz coords to spawn at, t0 = what object to spawn (0x017F boss explosion)
+
+	/* Calls to code.	*/
+	@FUNC_CLEAR_EFFECT equ 0x8005D004		;clears special effect space
+	@FUNC_SET_SFX_ID equ 0x80019218
+	@FUNC_SET_EFFECT_ID equ 0x8005CE48
 	
+	addiu sp, sp, -0x30
+	sw ra, 0x0000(sp)
+	sw a0, 0x0004(sp)	;size
+	sw a1, 0x0008(sp)	;x
+	sw a2, 0x000C(sp)	;y
+	sw a3, 0x0010(sp)	;z
+	swc1 f12, 0x0014(sp)
+	swc1 f14, 0x0018(sp)
+	swc1 f4, 0x0020(sp)
+	swc1 f6, 0x0024(sp)
+	swc1 f8, 0x0028(sp)
+	swc1 f10, 0x002C(sp)
+	li v0, 0x80165FA0	;end range
+	li v1, 0x801695C4	;start range
+	lb t1, 0x0000(v1)
+@@Loop:
+	bnel t1, r0, (@@CheckIfLoopNeeded)
+	addiu v1, v1, -140
+	sw v1, 0x001C(sp)	;mem space that was free
+	li a0, 0x017F
+	beq a0, t0, (@@DoBossExplosion)
+	nop
+	b (@@Return)
+	nop
+@@DoBossExplosion:
+	jal @FUNC_CLEAR_EFFECT
+	lw a0, 0x001C(sp)	;mem space that was free
+	lw a0, 0x0004(sp)	;size
+	lw a1, 0x0008(sp)	;x
+	lw a2, 0x000C(sp)	;y
+	lw a3, 0x0010(sp)	;z
+	jal SpawnBossExplosion
+	lw v1, 0x001C(sp)
+	b (@@Return)
+	nop
+@@CheckIfLoopNeeded:
+	sltu at, v1, v0
+	beql at, r0, (@@Loop)
+	lb t1, 0x0000(v1)
+@@Return:
+	lw ra, 0x0000(sp)
+	lwc1 f12, 0x0014(sp)
+	lwc1 f14, 0x0018(sp)
+	lwc1 f4, 0x0020(sp)
+	lwc1 f6, 0x0024(sp)
+	lwc1 f8, 0x0028(sp)
+	lwc1 f10, 0x002C(sp)
+	jr ra
+	addiu sp, sp, 0x30
+	nop
+	
+SpawnBossExplosion:
+	addiu sp, sp, -0x28
+	sw ra, 0x0000(sp)
+	sw s0, 0x0004(sp)
+	or s0, v1, r0
+	li t6, 1
+	sb t6, 0x0000(s0)
+	li t7, 0x17F
+	sh t7, 0x0002(s0)
+	mtc1 a0, f4
+	swc1 f4, 0x006C(s0)
+	li t8, 0x32		;time active
+	sh t8, 0x0050(s0)
+	li t9, 0xC8		;fade out timer
+	sh t9, 0x0044(s0)
+	mtc1 a1, f6
+	swc1 f6, 0x0004(s0)
+	mtc1 a2, f8
+	swc1 f8, 0x0008(s0)
+	mtc1 a3, f10
+	swc1 f10, 0x000C(s0)
+	li a3, 0x800C18B4
+	sw a3, 0x0010(sp)
+	li t0, 0x800C18BC
+	sw t0, 0x0014(sp)
+	li a0, 0x2940F026	;sfx id
+	addiu a1, s0, 0x80
+	jal @FUNC_SET_SFX_ID
+	li a2, 4
+	addiu a0, s0, 0x1C
+	jal @FUNC_SET_EFFECT_ID
+	lhu a1, 0x0002(s0)
+	lw ra, 0x0000(sp)
+	lw s0, 0x0004(sp)
+	jr ra
+	addiu sp, sp, 0x28
+	nop
 	
 SpawnSingleMissileOrShipSpecial:		;pass a0 as the memory address to spawn in. a1 the craft ID to target(only 00 fox, 02 slippy, 03 peppy), a2 speed (float), a3 missile (0) or ship (1) that shoots. t0-t2 xyz starting pos
 

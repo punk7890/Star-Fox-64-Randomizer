@@ -5,42 +5,56 @@
 .autoregion
 
 ;currently no logic for Endurance mode
-;use gSpecialStageChoosePlanetsFlag to force this mode if wanting to use this mode outside of regular logic already defined
+;use gSpecialStageChoosePlanetsFlag to force this stage if wanting to use this mode outside of regular logic already defined
+;s7 = planet ID from map screen -1
+;s0 = actual level ID until calls to game code are made (outside of randomizer calls)
+;s1 = training level ID until calls to game code are made (outside of randomizer calls)
 
 TBL_FUNC_SpecialStage:
 	lw v0, orga(gSpecialStageFlag) (gp)
 	beq v0, r0, (@@Exit)
 	lui t0, 0x8017
-	lw a0, 0xD9B8(t0) ;LOC_NUM_PLANETS_COMPLETED32
+	lw a0, 0xD9B8(t0) 	;LOC_NUM_PLANETS_COMPLETED32
+	; addiu a0, a0, -1	;subtract 1 completed time since a6/bolse auto
+						; ;adds completed times on the last few frames when the levels are ending. 
+	sll t1, a0, 2
+	addu t1, t1, t0
+	lw s7, 0xDA00(t1)	;get last planet completed by game logic (map screen planet IDs).
+	lw s0, (LOC_LEVEL_ID32)
+	li s1, 0xA	;training level ID
 	lw v0, orga(gSpecialStageChoosePlanetsFlag) (gp)
 	bne v0, r0, (@@BypassPlanetsDoneCheck)
 	nop
-	beq a0, r0, (@@Exit)	;if completed times is zero, assume marathon mode or just starting game so exit
+	beq a0, r0, (@@Exit)	;exit if completed times is 0 for assuming marathon mode
+	nop
+	jal CheckFoxState
+	li a1, 0x7
+	beq v0, a1, (@@CheckForPlanet)
 	nop
 @@BypassPlanetsDoneCheck:
-	addiu a0, a0, -1	;subtract 1 completed time since a6/bolse auto adds completed times. Training would be 6th completed.
-	sll t1, a0, 2
-	addu t1, t1, t0
-	lw s0, (LOC_LEVEL_ID32)
-	li s1, 0xA	;training level ID
-	lw s7, 0xDA00(t1)	;get last planet completed by game logic (map screen planet IDs). training mode doesn't get added by game logic
 	lb v0, (LOC_ENDSCREEN_FLAG8)
-	beq v0, r0, (@@CheckIfTrainingLoaded)
+	beq v0, r0, (@@CheckIfTrainingLoaded)	;used only to end training
 	nop
 	beq s0, s1, (@@InEndingSpecialStage)	;in ending screen on training
+	nop
+	j NextTableEntry
+	nop
+@@CheckForPlanet:
+	lh v0, (0x801578a0)		;check if soft reset map ID is training otherwise map colors won't update on transition
+	beq s1, v0, (@@CheckIfMapLoaded)
+	li v0, 0x13
+	beq s0, v0, (@@Exit)	;exit if in ending state on venoms or tunnels
+	li v0, 0x9
+	beq s0, v0, (@@Exit)
+	li v0, 0x6
+	beq s0, v0, (@@Exit)
 	li v0, PLANET_BOLSE
-	beq s7, v0, (@@IfBolse)
+	beq s7, v0, (@@IfBolse)	;check for planet ID from map screen is equal
 	li v0, PLANET_A6
 	beq s7, v0, (@@IfA6)
 	nop
-	b @@Exit
+	j NextTableEntry
 	nop
-; @@MarathonModeCheck:
-	; lw v0, orga(gMarathonModeFlag) (gp)
-	; beq v0, r0, (@@Exit)
-	; nop
-	; b @@Exit
-	; nop
 @@IfBolse:
 	lw v0, orga(gBossRushModeFlag) (gp)
 	bne v0, r0, (@@BolseBRM)
@@ -52,7 +66,7 @@ TBL_FUNC_SpecialStage:
 	li v1, 2
 	beq a0, v1, (@@BolseRandomFlagCheck)
 	nop
-	b @@Exit
+	j NextTableEntry
 	nop
 @@BolseBRM:
 	lw v0, orga(gMarathonModeFlag) (gp)
@@ -62,14 +76,14 @@ TBL_FUNC_SpecialStage:
 	li v1, 2
 	beq a0, v1, (@@BolseRandomFlagCheck)
 	nop
-	b @@Exit
+	j NextTableEntry
 	nop
 	
 @@BolseMarathon:
-	b (@@Exit)
+	j NextTableEntry
 	nop
 @@BolseBRMMarathon:
-	b (@@Exit)
+	j NextTableEntry
 	nop
 	
 @@BolseScoreCheck:
@@ -80,7 +94,7 @@ TBL_FUNC_SpecialStage:
 	nop
 	li v0, 0xA
 	sh v0, (0x80186502)	;overwrite planet to go into from bolse level function
-	b @@Exit
+	j NextTableEntry
 	nop
 @@BolseScoreCheckBRM:
 	lw a0, (LOC_PLAYER_TOTAL_HITS32)
@@ -90,7 +104,7 @@ TBL_FUNC_SpecialStage:
 	nop
 	li v0, 0xA
 	sh v0, (0x80186502)	;overwrite planet to go into from bolse level function
-	b @@Exit
+	j NextTableEntry
 	nop
 	
 @@BolseRandomFlagCheck:
@@ -98,7 +112,7 @@ TBL_FUNC_SpecialStage:
 	beq a0, r0, (@@Exit)	;bad luck
 	li v0, 0xA
 	sh v0, (0x80186502)	;overwrite planet to go into from bolse level function
-	b @@Exit
+	j NextTableEntry
 	nop
 	
 @@IfA6:
@@ -112,7 +126,7 @@ TBL_FUNC_SpecialStage:
 	li v1, 2
 	beq a0, v1, (@@A6RandomFlagCheck)
 	nop
-	b @@Exit
+	j NextTableEntry
 	nop
 
 @@A6BRM:
@@ -123,7 +137,7 @@ TBL_FUNC_SpecialStage:
 	li v1, 2
 	beq a0, v1, (@@A6RandomFlagCheck)
 	nop
-	b @@Exit
+	j NextTableEntry
 	nop
 	
 @@A6BRMMarathon:
@@ -132,7 +146,7 @@ TBL_FUNC_SpecialStage:
 	li v1, 2
 	beq a0, v1, (@@A6RandomFlagCheck)
 	nop
-	b @@Exit
+	j NextTableEntry
 	nop
 	
 @@A6Marathon:
@@ -141,7 +155,7 @@ TBL_FUNC_SpecialStage:
 	li v1, 2
 	beq a0, v1, (@@A6RandomFlagCheck)
 	nop
-	b @@Exit
+	j NextTableEntry
 	nop
 	
 @@A6ScoreCheck:
@@ -152,7 +166,7 @@ TBL_FUNC_SpecialStage:
 	nop
 	li v0, 0xA
 	sh v0, (0x801858FE)	;overwrite planet to go into from A6 level function
-	b @@Exit
+	j NextTableEntry
 	nop
 @@A6ScoreCheckBRM:
 	lw a0, (LOC_PLAYER_TOTAL_HITS32)
@@ -162,7 +176,7 @@ TBL_FUNC_SpecialStage:
 	nop
 	li v0, 0xA
 	sh v0, (0x801858FE)	;overwrite planet to go into from A6 level function
-	b @@Exit
+	j NextTableEntry
 	nop
 @@A6ScoreCheckBRMMarathon:
 	lw a0, (LOC_PLAYER_TOTAL_HITS32)
@@ -172,7 +186,7 @@ TBL_FUNC_SpecialStage:
 	nop
 	li v0, 0xA
 	sh v0, (0x801858FE)	;overwrite planet to go into from A6 level function
-	b @@Exit
+	j NextTableEntry
 	nop
 @@A6ScoreCheckMarathon:
 	lw a0, (LOC_PLAYER_TOTAL_HITS32)
@@ -182,7 +196,7 @@ TBL_FUNC_SpecialStage:
 	nop
 	li v0, 0xA
 	sh v0, (0x801858FE)	;overwrite planet to go into from A6 level function
-	b @@Exit
+	j NextTableEntry
 	nop
 	
 @@A6RandomFlagCheck:
@@ -190,27 +204,23 @@ TBL_FUNC_SpecialStage:
 	beq a0, r0, (@@Exit)	;bad luck
 	li v0, 0xA
 	sh v0, (0x801858FE)	;overwrite planet to go into from A6 level function
-	b @@Exit
+	j NextTableEntry
 	nop
 
 @@InEndingSpecialStage:
-	;do teammate alive bonus cals for score adding
-	; jal DoSpecialState
-	; li a0, 3
+	;do teammate alive bonus cals for score adding ?
 	lw a0, orga(gSpecialStageEndWaitTimer) (gp)
 	addiu a0, a0, 1
 	sw a0, orga(gSpecialStageEndWaitTimer) (gp)
 	sltiu v0, a0, 250
 	bne v0, r0, (@@Exit)	;wait 250 frames
-	; li a0, 2
-	; jal DoSpecialState
 	nop
 	li v0, PLANET_BOLSE
 	beq s7, v0, (@@WarpToVE1)
 	li v0, PLANET_A6
 	beq s7, v0, (@@WarpToVE2)
 	nop
-	;shouldn't go here unless choose planets was on
+	;shouldn't go here unless choose planets was on and last completed level wasn't bolse/a6
 	jal DoSoftResetWithFlag
 	li a0, 4
 	sw r0, orga(gSpecialStageEndWaitTimer) (gp)
@@ -250,7 +260,7 @@ TBL_FUNC_SpecialStage:
 @@CheckIfTrainingLoaded:
 	beq s0, s1, (@@CheckIfBossRush)
 	nop
-	b (@@Exit)	;exit since not training level
+	j NextTableEntry	;exit since not training level
 	nop
 @@CheckIfBossRush:
 	lw v0, orga(gBossRushModeFlag) (gp)
@@ -259,7 +269,6 @@ TBL_FUNC_SpecialStage:
 	sw v1, orga(gTimerScoreToDisplay) (gp)	;set and force timer to 5000 points if BRM is on.
 	
 @@DoRetryAndDeadLogic:
-	;do retry and dead logic
 	lw a0, (LOC_PAUSE_STATE32)
 	li v0, 2
 	beq a0, v0, (@@FindPlanet)	;check if quit from pause screen
@@ -529,7 +538,7 @@ TBL_FUNC_SpecialStage:
 	li t4, 0xA			;model of craft
 	li t5, 2			;laser type / other model
 	li t6, 32			;health
-	li t7, 5			;hits when killed
+	li t7, 3			;hits when killed
 	li t8, 0	;engine sound
 	jal SpawnSingleCraftSpecial
 	li v0, 0x00C5		;main craft type
@@ -561,7 +570,7 @@ TBL_FUNC_SpecialStage:
 	li t4, 0xA			;model of craft
 	li t5, 2			;laser type / other model
 	li t6, 32			;health
-	li t7, 5			;hits when killed
+	li t7, 3			;hits when killed
 	li t8, 0x0	;engine sound
 	jal SpawnSingleCraftSpecial
 	li v0, 0x00C5		;main craft type
@@ -577,7 +586,7 @@ TBL_FUNC_SpecialStage:
 	li t4, 0xA			;model of craft
 	li t5, 2			;laser type / other model
 	li t6, 32			;health
-	li t7, 5			;hits when killed
+	li t7, 3			;hits when killed
 	li t8, 0x0	;engine sound
 	jal SpawnSingleCraftSpecial
 	li v0, 0x00C5		;main craft type
@@ -593,7 +602,7 @@ TBL_FUNC_SpecialStage:
 	li t4, 0xA			;model of craft
 	li t5, 2			;laser type / other model
 	li t6, 32			;health
-	li t7, 5			;hits when killed
+	li t7, 3			;hits when killed
 	li t8, 0x0	;engine sound
 	jal SpawnSingleCraftSpecial
 	li v0, 0x00C5		;main craft type
@@ -648,7 +657,7 @@ TBL_FUNC_SpecialStage:
 	li t4, 0xA			;model of craft
 	li t5, 2			;laser type / other model
 	li t6, 32			;health
-	li t7, 5			;hits when killed
+	li t7, 3			;hits when killed
 	li t8, 0	;engine sound
 	jal SpawnSingleCraftSpecial
 	li v0, 0x00C5		;main craft type
@@ -691,7 +700,7 @@ TBL_FUNC_SpecialStage:
 	li t4, 0xA			;model of craft
 	li t5, 2			;laser type / other model
 	li t6, 32			;health
-	li t7, 5			;hits when killed
+	li t7, 3			;hits when killed
 	li t8, 0x0	;engine sound
 	jal SpawnSingleCraftSpecial
 	li v0, 0x00C5		;main craft type
@@ -735,7 +744,7 @@ TBL_FUNC_SpecialStage:
 	li t4, 0xA			;model of craft
 	li t5, 2			;laser type / other model
 	li t6, 32			;health
-	li t7, 5			;hits when killed
+	li t7, 3			;hits when killed
 	li t8, 0x0	;engine sound
 	jal SpawnSingleCraftSpecial
 	li v0, 0x00C5		;main craft type
@@ -869,7 +878,7 @@ TBL_FUNC_SpecialStage:
 	li t4, 0xA			;model of craft
 	li t5, 2			;laser type / other model
 	li t6, 32			;health
-	li t7, 5			;hits when killed
+	li t7, 3			;hits when killed
 	li t8, 0x0	;engine sound
 	jal SpawnSingleCraftSpecial
 	li v0, 0x00C5		;main craft type
@@ -935,7 +944,7 @@ TBL_FUNC_SpecialStage:
 	li t4, 0xA			;model of craft
 	li t5, 2			;laser type / other model
 	li t6, 32			;health
-	li t7, 5			;hits when killed
+	li t7, 3			;hits when killed
 	li t8, 0x0	;engine sound
 	jal SpawnSingleCraftSpecial
 	li v0, 0x00C5		;main craft type
@@ -954,7 +963,7 @@ TBL_FUNC_SpecialStage:
 	li t4, 0xA			;model of craft
 	li t5, 2			;laser type / other model
 	li t6, 32			;health
-	li t7, 5			;hits when killed
+	li t7, 3			;hits when killed
 	li t8, 0x0	;engine sound
 	jal SpawnSingleCraftSpecial
 	li v0, 0x00C5		;main craft type
@@ -969,7 +978,7 @@ TBL_FUNC_SpecialStage:
 	li t4, 0xA			;model of craft
 	li t5, 2			;laser type / other model
 	li t6, 32			;health
-	li t7, 5			;hits when killed
+	li t7, 3			;hits when killed
 	li t8, 0x0	;engine sound
 	jal SpawnSingleCraftSpecial
 	li v0, 0x00C5		;main craft type
@@ -984,7 +993,7 @@ TBL_FUNC_SpecialStage:
 	li t4, 0xA			;model of craft
 	li t5, 2			;laser type / other model
 	li t6, 32			;health
-	li t7, 5			;hits when killed
+	li t7, 3			;hits when killed
 	li t8, 0x0	;engine sound
 	jal SpawnSingleCraftSpecial
 	li v0, 0x00C5		;main craft type
@@ -1036,7 +1045,7 @@ TBL_FUNC_SpecialStage:
 	li t4, 0xA			;model of craft
 	li t5, 2			;laser type / other model
 	li t6, 32			;health
-	li t7, 5			;hits when killed
+	li t7, 3			;hits when killed
 	li t8, 0x0	;engine sound
 	jal SpawnSingleCraftSpecial
 	li v0, 0x00C5		;main craft type
@@ -1058,7 +1067,7 @@ TBL_FUNC_SpecialStage:
 	li t4, 0xA			;model of craft
 	li t5, 2			;laser type / other model
 	li t6, 32			;health
-	li t7, 5			;hits when killed
+	li t7, 3			;hits when killed
 	li t8, 0x0	;engine sound
 	jal SpawnSingleCraftSpecial
 	li v0, 0x00C5		;main craft type
@@ -1080,7 +1089,7 @@ TBL_FUNC_SpecialStage:
 	li t4, 0xA			;model of craft
 	li t5, 2			;laser type / other model
 	li t6, 32			;health
-	li t7, 5			;hits when killed
+	li t7, 3			;hits when killed
 	li t8, 0x0	;engine sound
 	jal SpawnSingleCraftSpecial
 	li v0, 0x00C5		;main craft type
@@ -1131,7 +1140,7 @@ TBL_FUNC_SpecialStage:
 
 @@SuperWolfCheck:
 	lw v0, (LOC_PLAYER_HITS32)
-	sltiu v1, v0, 200	;check if level hits is 200 or more
+	sltiu v1, v0, 150	;check if level hits is 200 or more
 	bne v1, r0, (@@SuperWolfAliveCheck)
 	lw v0, orga(gSpecialStageSuperWolfFlag) (gp)
 	bne v0, r0, (@@SuperWolfAliveCheck)
@@ -1186,7 +1195,7 @@ TBL_FUNC_SpecialStage:
 	
 @@SuperWolfCheck2:
 	lw v0, (LOC_PLAYER_HITS32)
-	sltiu v1, v0, 400	;check if level hits is 400 or more
+	sltiu v1, v0, 250	;check if level hits is 400 or more
 	bne v1, r0, (@@SuperWolfAliveCheck2)
 	lw v0, orga(gSpecialStageSuperWolfFlag2) (gp)
 	bne v0, r0, (@@SuperWolfAliveCheck2)
@@ -1241,7 +1250,7 @@ TBL_FUNC_SpecialStage:
 	
 @@SuperWolfCheck3:
 	lw v0, (LOC_PLAYER_HITS32)
-	sltiu v1, v0, 600	;check if level hits is 600 or more
+	sltiu v1, v0, 350	;check if level hits is 600 or more
 	bne v1, r0, (@@SuperWolfAliveCheck3)
 	lw v0, orga(gSpecialStageSuperWolfFlag3) (gp)
 	bne v0, r0, (@@SuperWolfAliveCheck3)
@@ -1297,6 +1306,8 @@ TBL_FUNC_SpecialStage:
 @@TimerEndingCheck:
 	sltiu v0, s7, 300
 	bne v0, r0, (@@JamesCheck)
+	li v1, 3
+	sb v1, (0x8015bc14)		;give star wolf enemy spawned by game code +3 hits for killing
 	lui at, 0x8015
 	lw v0, 0x57A0(at)
 	bne v0, r0, (@@JamesCheck)
@@ -1362,9 +1373,18 @@ TBL_FUNC_SpecialStage:
 	lw v1, (0x8016A594)
 	li v0, 0x40200000
 	bne v0, v1, (@@IfPauseCheck)
-	li.u a0, 0x2940C00A
-	jal PlaySFX
-	li.l a0, 0x2940C00A
+	; li.u a0, 0x2940C00A
+	; jal PlaySFX
+	; li.l a0, 0x2940C00A
+	li a0, 86.0
+	la v0, 0x8016A550	;Fox bomb address
+	lw a1, 0x0004(v0)	;x
+	lw a2, 0x0008(v0)	;y
+	lw a3, 0x000C(v0)	;z
+	li t0, 0x017F
+	jal PlaceSpecialEffect
+	nop
+	
 @@IfPauseCheck:
 	lw v0, LOC_SPECIAL_STATE
 	li v1, 0x64
