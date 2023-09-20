@@ -478,14 +478,6 @@ TBL_FUNC_BossRushMode:
 	;sw r0, orga(gBRMAddToCompletedTimesFlag) (gp)
 	lw a0, orga(gTimerScoreREGULAR) (gp)
 	sw a0, orga(gTimerScoreToDisplay) (gp)
-	lw v0, orga(gPlayerLivesNotEqualFlagBRM)(gp)
-	bne v0, r0, (@@ContinueMapScreenChecks)
-	nop
-	jal LoadPlayerInfoToGame
-	nop
-	lw a1, 0x0000(s0)	;total hits
-	sw a1, orga(gTimerFinalScore) (gp)
-@@ContinueMapScreenChecks:
 	jal KillLevelStoreFunction
 	nop
 	lw v0, orga(gBRMAddToCompletedTimesFlag) (gp)
@@ -497,19 +489,26 @@ TBL_FUNC_BossRushMode:
 @@CheckLives:
 	jal @CheckPrevLivesBRM	;check if player retried
 	nop
-@@IfMarathonModeCheck:
 	lw v0, orga(gMarathonModeFlag) (gp)
-	beq v0, r0, (@@Exit)
+	beq v0, r0, (@@CheckLivesNotEqualFlag)
 	nop
-	;put prevscore logic here and move marathon mode check -- doesn't this work already???
 	la t0, gBRMLevelList
 	lw a0, orga(gBRMAddToCompletedTimes) (gp)
 	addu t0, a0, t0
 	lb a0, 0x0000(t0)	;get level based on completed times
 	jal StoreLevelID	;store level
 	nop
+@@CheckLivesNotEqualFlag:
+	lw v0, orga(gPlayerLivesNotEqualFlagBRM)(gp)
+	bne v0, r0, (@@Exit)
+	nop
+	jal LoadPlayerInfoToGame
+	nop
+	lw a1, 0x0000(s0)	;total hits
+	sw a1, orga(gTimerFinalScore) (gp)
 	j NextTableEntry
 	nop
+
 	
 	
 	
