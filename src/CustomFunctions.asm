@@ -305,6 +305,7 @@ LoadPlayerInfoToGP:		;sets and stores various global player related information 
 	sw a0, orga(gPreviousLives)(gp)
 	sw a1, orga(gPreviousLasers)(gp)
 	sw a2, orga(gPreviousTotalScore)(gp)
+	sw a2, orga(gTimerFinalScore)(gp)
 	sw a3, orga(gPreviousBombs)(gp)
 	lw a0, (LOC_EXPERT_FLAG32)	;expert flag
 	sw a0, orga(gPreviousExpertFlag) (gp)
@@ -323,6 +324,7 @@ LoadPlayerInfoToGame:		;restores global player stats to main game
 	sb a0, 0x7911(at)   ;lives
 	sb a1, 0x791B(at)	;lasers
 	sw a2, 0x7584(at)	;total hits
+	sw a2, orga(gTimerFinalScore)(gp)
 	sb.u a3, (LOC_PLAYER_BOMBS8)
 	sb.l a3, (LOC_PLAYER_BOMBS8)
 	lw a0, (LOC_EXPERT_FLAG32)	;expert flag

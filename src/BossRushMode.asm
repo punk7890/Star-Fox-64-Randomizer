@@ -400,19 +400,19 @@ TBL_FUNC_BossRushMode:
 	lw v0, orga(gMarathonModeFlag) (gp)
 	bne v0, r0, (@@MarathonModeEndingSceneChecks)
 	li v0, 0xB
-	beq s1, v0, (@@IfMacBethNotMarathon)
+	beq s2, v0, (@@IfMacBethNotMarathon)
 	nop
 	j NextTableEntry
 	nop
 @@MarathonModeEndingSceneChecks:
 	li v0, 0x11
-	beq s1, v0, (@@IfBolse)
+	beq s2, v0, (@@IfBolse)
 	li v0, 0x13
-	beq s1, v0, (@@IfVE2)
+	beq s2, v0, (@@IfVE2)
 	li v0, 0xB
-	beq s1, v0, (@@IfMacBeth)
+	beq s2, v0, (@@IfMacBeth)
 	li v0, 0x3
-	beq s1, v0, (@@IfA6)
+	beq s2, v0, (@@IfA6)
 	nop
 	j NextTableEntry
 	nop
@@ -468,7 +468,7 @@ TBL_FUNC_BossRushMode:
 	
 @@MapScreenStuff:
 	lw v0, orga(gMarathonModeFlag) (gp)
-	beq v0, r0, (@@MarathonNotOn)
+	bne v0, r0, (@@MarathonNotOn)
 	lw a0, orga(gCornFlag) (gp)		;randomize what boss to enter on corneria since marathon isn't on
 	xori a0, a0, 1
 	sw a0, orga(gCornFlag) (gp)
@@ -478,8 +478,14 @@ TBL_FUNC_BossRushMode:
 	;sw r0, orga(gBRMAddToCompletedTimesFlag) (gp)
 	lw a0, orga(gTimerScoreREGULAR) (gp)
 	sw a0, orga(gTimerScoreToDisplay) (gp)
+	lw v0, orga(gPlayerLivesNotEqualFlagBRM)(gp)
+	bne v0, r0, (@@ContinueMapScreenChecks)
+	nop
+	jal LoadPlayerInfoToGame
+	nop
 	lw a1, 0x0000(s0)	;total hits
 	sw a1, orga(gTimerFinalScore) (gp)
+@@ContinueMapScreenChecks:
 	jal KillLevelStoreFunction
 	nop
 	lw v0, orga(gBRMAddToCompletedTimesFlag) (gp)
@@ -637,8 +643,8 @@ TBL_FUNC_BossRushMode:
 	nop
 	
 @DoTimerLogic:	;this would look less messy, but the game does weird things with Fox states on Venom surface and tunnels
-	; lw v0, orga(gTimerActive) (gp)
-	; beq v0, r0, (@@EndLogic)
+	lw v0, orga(gTimerActive) (gp)
+	beq v0, r0, (@@EndLogic)
 ; @@DeadStateChecks:
 	li v0, 0x4
 	beq s1, v0, (@@IsDeadState4)	;checks for if dead or retrying

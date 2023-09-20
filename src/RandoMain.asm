@@ -1938,12 +1938,16 @@ TBL_FUNC_ExtraStarWolfs:	;puts star wolfs in Sector Z, Y, Katina, Andross 2 and 
 
 	lw at, orga(gExtraStarWolfsFlag) (gp)
 	beq at, r0, (@@MainMenuCheck)
+	lw v0, (LOC_ALIVE_TIMER32)
+	li v1, 2
+	bne v0, v1, (@@CheckMapScreenStates)	;only set wolf flags on second frame of entering level
 	li v1, 1
 	sw.u v1, (0x8016DB40)
-	sw.l v1, (0x8016DB40)	;set wolf team flags to spawnable for game code
+	sw.l v1, (0x8016DB40)	;set wolf team flags to spawnable for game code 
 	sw.l v1, (0x8016DB44)
 	sw.l v1, (0x8016DB48)
 	sw.l v1, (0x8016DB4c)
+@@CheckMapScreenStates:
 	jal CheckMapScreenState
 	li v1, 3
 	beq v1, v0, (@@InMapScreen)
@@ -2026,14 +2030,64 @@ TBL_FUNC_ExtraStarWolfs:	;puts star wolfs in Sector Z, Y, Katina, Andross 2 and 
 	li v0, 1
 	sw v0, orga(gWolfsSpawnedFlag) (gp)
 	sw r0, (0x8002e858)	;remove branch in game code so wolf team can shoot
-	li a0, 0x8015AD14
-	li a1, 1
-	jal SpawnSingleStarWolfRegularMode
-	li a2, 5
-	li a0, 0x8015B008
-	li a1, 2
-	jal SpawnSingleStarWolfRegularMode
-	li a2, 6
+	li a0, 0x8015AD14	;mem space to spawn
+	li a1, 0x1			;craft to target
+	li a2, 9			;item to drop
+	li t0, 0x4375F89D	;x coords to spawn at
+	li t1, 0x45300721	;y coords to spawn at
+	li t2, 0xC69019A0	;z coords to spawn at
+	li t3, 0x42000000	;can be targeted or not
+	li t4, 0x5			;model of craft
+	li t5, 0			;laser type / other model
+	li t6, 64			;health
+	li t7, 10			;hits when killed
+	li t8, 0x31004005	;engine sound
+	jal SpawnSingleCraftSpecial
+	li v0, 0x00C5		;main craft type
+	li a0, 0x8015B008	;mem space to spawn
+	li a1, 0x2			;craft to target
+	li a2, 1			;item to drop
+	li t0, 0x4470F89D	;x coords to spawn at
+	li t1, 0x45300721	;y coords to spawn at
+	li t2, 0xC69019A0	;z coords to spawn at
+	li t3, 0x42000000	;can be targeted or not
+	li t4, 0x6			;model of craft
+	li t5, 0			;laser type / other model
+	li t6, 64			;health
+	li t7, 10			;hits when killed
+	li t8, 0x31004005	;engine sound
+	jal SpawnSingleCraftSpecial
+	li v0, 0x00C5		;main craft type
+	lw v0, (LOC_EXPERT_FLAG32)
+	beq v0, r0, (NextTableEntry)	;spawn extra wolfs if on expert
+	li a0, 0x8015B2FC	;mem space to spawn
+	li a1, 0x0			;craft to target
+	li a2, 0x19			;item to drop
+	li t0, 0x44B0F89D	;x coords to spawn at
+	li t1, 0x45300721	;y coords to spawn at
+	li t2, 0xC69019A0	;z coords to spawn at
+	li t3, 0x42000000	;can be targeted or not
+	li t4, 0x4			;model of craft
+	li t5, 0			;laser type / other model
+	li t6, 64			;health
+	li t7, 10			;hits when killed
+	li t8, 0x31004005	;engine sound
+	jal SpawnSingleCraftSpecial
+	li v0, 0x00C5		;main craft type
+	li a0, 0x8015B5F0	;mem space to spawn
+	li a1, 0x0			;craft to target
+	li a2, 0x5			;item to drop
+	li t0, 0x4510F89D	;x coords to spawn at
+	li t1, 0x45300721	;y coords to spawn at
+	li t2, 0xC69019A0	;z coords to spawn at
+	li t3, 0x42000000	;can be targeted or not
+	li t4, 0x4			;model of craft
+	li t5, 0			;laser type / other model
+	li t6, 64			;health
+	li t7, 10			;hits when killed
+	li t8, 0x31004005	;engine sound
+	jal SpawnSingleCraftSpecial
+	li v0, 0x00C5		;main craft type
 	b (NextTableEntry)
 	nop
 	
@@ -2088,14 +2142,50 @@ TBL_FUNC_ExtraStarWolfs:	;puts star wolfs in Sector Z, Y, Katina, Andross 2 and 
 	li v0, 1
 	sw v0, orga(gWolfsSpawnedFlag) (gp)
 	sw r0, (0x8002e858)	;remove branch in game code so wolf team can shoot
-	li a0, 0x8015AD14
-	li a1, 1
-	jal SpawnSingleStarWolfRegularMode
-	li a2, 5
-	li a0, 0x8015B008
-	li a1, 2
-	jal SpawnSingleStarWolfRegularMode
-	li a2, 6
+	li a0, 0x8015AD14	;mem space to spawn
+	li a1, 0x1			;craft to target
+	li a2, 1			;item to drop
+	li t0, 0x4375F89D	;x coords to spawn at
+	li t1, 0x45300721	;y coords to spawn at
+	li t2, 0xC69019A0	;z coords to spawn at
+	li t3, 0x42000000	;can be targeted or not
+	li t4, 0x5			;model of craft
+	li t5, 0			;laser type / other model
+	li t6, 64			;health
+	li t7, 10			;hits when killed
+	li t8, 0x31004005	;engine sound
+	jal SpawnSingleCraftSpecial
+	li v0, 0x00C5		;main craft type
+	li a0, 0x8015B008	;mem space to spawn
+	li a1, 0x2			;craft to target
+	li a2, 1			;item to drop
+	li t0, 0x4470F89D	;x coords to spawn at
+	li t1, 0x45300721	;y coords to spawn at
+	li t2, 0xC69019A0	;z coords to spawn at
+	li t3, 0x42000000	;can be targeted or not
+	li t4, 0x6			;model of craft
+	li t5, 0			;laser type / other model
+	li t6, 64			;health
+	li t7, 10			;hits when killed
+	li t8, 0x31004005	;engine sound
+	jal SpawnSingleCraftSpecial
+	li v0, 0x00C5		;main craft type
+	lw v0, (LOC_EXPERT_FLAG32)
+	beq v0, r0, (NextTableEntry)	;spawn extra wolf if on expert
+	li a0, 0x8015B2FC	;mem space to spawn
+	li a1, 0x0			;craft to target
+	li a2, 0x19			;item to drop
+	li t0, 0x44B0F89D	;x coords to spawn at
+	li t1, 0x45300721	;y coords to spawn at
+	li t2, 0xC69019A0	;z coords to spawn at
+	li t3, 0x42000000	;can be targeted or not
+	li t4, 0x4			;model of craft
+	li t5, 0			;laser type / other model
+	li t6, 64			;health
+	li t7, 10			;hits when killed
+	li t8, 0x31004005	;engine sound
+	jal SpawnSingleCraftSpecial
+	li v0, 0x00C5		;main craft type
 	b (NextTableEntry)
 	nop
 	
@@ -2121,14 +2211,78 @@ TBL_FUNC_ExtraStarWolfs:	;puts star wolfs in Sector Z, Y, Katina, Andross 2 and 
 	; li v0, 1
 	; sw v0, orga(gWolfsSpawnedFlag) (gp)	;not needed for this level
 	sw r0, (0x8002e858)	;remove branch in game code so wolf team can shoot
-	li a0, 0x8015AD14
-	li a1, 0
-	jal SpawnSingleStarWolfRegularMode
-	li a2, 4
-	li a0, 0x8015B008
-	li a1, 0
-	jal SpawnSingleStarWolfRegularMode
-	li a2, 7
+	li a0, 0x8015AD14	;mem space to spawn
+	li a1, 0x0			;craft to target
+	li a2, 1			;item to drop
+	li t0, 0x4375F89D	;x coords to spawn at
+	li t1, 0x45300721	;y coords to spawn at
+	li t2, 0xC69019A0	;z coords to spawn at
+	li t3, 0x42000000	;can be targeted or not
+	li t4, 0x5			;model of craft
+	li t5, 0			;laser type / other model
+	li t6, 64			;health
+	li t7, 10			;hits when killed
+	li t8, 0x31004005	;engine sound
+	jal SpawnSingleCraftSpecial
+	li v0, 0x00C5		;main craft type
+	li a0, 0x8015B008	;mem space to spawn
+	li a1, 0x0			;craft to target
+	li a2, 1			;item to drop
+	li t0, 0x4470F89D	;x coords to spawn at
+	li t1, 0x45300721	;y coords to spawn at
+	li t2, 0xC69019A0	;z coords to spawn at
+	li t3, 0x42000000	;can be targeted or not
+	li t4, 0x6			;model of craft
+	li t5, 0			;laser type / other model
+	li t6, 64			;health
+	li t7, 10			;hits when killed
+	li t8, 0x31004005	;engine sound
+	jal SpawnSingleCraftSpecial
+	li v0, 0x00C5		;main craft type
+	li a0, 0x8015B2FC	;mem space to spawn
+	li a1, 0x5			;craft to target
+	li a2, 0			;item to drop
+	li t0, 0xC420D3BC	;x coords to spawn at
+	li t1, 0x448EC3E2	;y coords to spawn at
+	li t2, 0x43574000	;z coords to spawn at
+	li t3, 0			;can be targeted or not
+	li t4, 0x8			;model of craft
+	li t5, 0			;laser type / other model
+	li t6, 300			;health
+	li t7, 0			;hits when killed
+	li t8, 0			;engine sound
+	jal SpawnSingleCraftSpecial
+	li v0, 0x00C5		;main craft type
+	li a0, 0x8015B5F0	;mem space to spawn
+	li a1, 0x6			;craft to target
+	li a2, 0			;item to drop
+	li t0, 0xC470D3BC	;x coords to spawn at
+	li t1, 0x448EC3E2	;y coords to spawn at
+	li t2, 0x43574000	;z coords to spawn at
+	li t3, 0			;can be targeted or not
+	li t4, 0x9			;model of craft
+	li t5, 0			;laser type / other model
+	li t6, 300			;health
+	li t7, 0			;hits when killed
+	li t8, 0			;engine sound
+	jal SpawnSingleCraftSpecial
+	li v0, 0x00C5		;main craft type
+	lw v0, (LOC_EXPERT_FLAG32)
+	beq v0, r0, (NextTableEntry)	;spawn extra wolf if on expert
+	li a0, 0x8015B8E4	;mem space to spawn
+	li a1, 0x0			;craft to target
+	li a2, 0x19			;item to drop
+	li t0, 0x44B0F89D	;x coords to spawn at
+	li t1, 0x45300721	;y coords to spawn at
+	li t2, 0xC69019A0	;z coords to spawn at
+	li t3, 0x42000000	;can be targeted or not
+	li t4, 0x4			;model of craft
+	li t5, 0			;laser type / other model
+	li t6, 64			;health
+	li t7, 10			;hits when killed
+	li t8, 0x31004005	;engine sound
+	jal SpawnSingleCraftSpecial
+	li v0, 0x00C5		;main craft type
 	b (NextTableEntry)
 	nop
 
