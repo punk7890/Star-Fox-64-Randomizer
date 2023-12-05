@@ -14,6 +14,8 @@
 		;6 = dead
 		;7 = completed level scene
 		;9 = changing to all range mode
+		;+0x049C right wing state(byte, 0x2 has wing, 0x1 wing destroyed)
+		;+0x049D left wing state(byte, 0x2 has wing, 0x1 wing destroyed)
 	.definelabel LOC_SPECIAL_STATE, 0x8016D6C4 	;0x1 = reset level or restart at checkpoint (crashes on hardware), 0x2 resume, 0x3 softlock (set to 0x2 to resume), 0x64 pause
 	.definelabel LOC_POWER_ON_TIMER32, 0x800C18C0		;a simple incremental timer since power on
 	.definelabel LOC_ALIVE_TIMER32, 0x8016dc20 			;incremental timer since player spawned. resets if died.
