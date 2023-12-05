@@ -8,7 +8,7 @@
 .region 0x8000	;No idea how to properly use all 64kb of global pointer space with this compiler, so it's limited to 32kb.
 
 GLOBAL_POINTER:		;top of global pointer
-.asciiz "2023-09-20 00:12:12"
+.asciiz "2023-12-04 16:49:38"
 .align 4,0
 
 gDebugModeFlag:		;enables a set of test features
@@ -63,7 +63,7 @@ gMarathonModeLevelList:
 .d8 0x2 ;SX
 .d8 0xC ;Titania
 .d8 0x11 ;Bolse
-.d8 0x6 ;VE1 
+;.d8 0x6 ;VE1 
 .d8 0x10 ;Katina
 .d8 0x7 ;Solar
 .d8 0xB ;MacBeth
