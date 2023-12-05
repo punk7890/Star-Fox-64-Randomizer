@@ -1859,14 +1859,34 @@ SUB_InGameText:		;function for displaying in-game text whenever. Can use at-t7 a
 	
 @@ButtonPressCheck9:
 	li a0, BUTTON_Z16 + BUTTON_R16 + BUTTON_C_UP16	;add hypers
-	bne a0, v0, (@@CheckMapScreenState)
+	bne a0, v0, (@@ButtonPressCheck10)
 	andi a0, v1, BUTTON_C_UP16
-	beq a0, r0, (@@CheckMapScreenState)
+	beq a0, r0, (@@ButtonPressCheck10)
 	li a0, 2
 	sb a0, (LOC_PLAYER_LASER8)
 	li.u a0, SFX_OBTAIN_LASER
 	jal PlaySFX
 	li.l a0, SFX_OBTAIN_LASER
+	b (@@CheckMapScreenState)
+	nop
+	
+@@ButtonPressCheck10:
+	li a0, BUTTON_Z16 + BUTTON_R16 + BUTTON_C_DOWN16	;repair wings and add health
+	bne a0, v0, (@@CheckMapScreenState)
+	andi a0, v1, BUTTON_C_DOWN16
+	beq a0, r0, (@@CheckMapScreenState)
+	li a0, 0x3C
+	sw a0, (LOC_WINGHEALTH_R32)
+	sw a0, (LOC_WINGHEALTH_L32)
+	li a0, 0x049C
+	jal SetFoxState
+	lui a1, 0x0202
+	li a0, 0x026C
+	jal SetFoxState
+	li a1, 0x7F
+	li.u a0, SFX_OBTAIN_STAR
+	jal PlaySFX
+	li.l a0, SFX_OBTAIN_STAR
 	b (@@CheckMapScreenState)
 	nop
 	
