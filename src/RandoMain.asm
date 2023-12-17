@@ -1446,7 +1446,7 @@ TBL_FUNC_RandomPortraits:		;creates a call to game code based on level ID. There
 	li v1, 0x12
 	beq v0, v1, (@@SolorAndSZ)
 	li v1, 0x8
-	beq v0, v1, (@@Zoness)
+	beq v0, v1, (@@RestoreOpCodes)	;skip because this is crashing for some reason here
 	li v1, 0x9
 	beq v0, v1, (@@VEtunnels)
 	li v1, 0xB
