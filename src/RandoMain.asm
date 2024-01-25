@@ -358,11 +358,11 @@ TBL_FUNC_QuickScoreScreens:		;allows quick end score screens
 	lw t1, (LOC_FOX_POINTER32)
 	beq t1, r0, (NextTableEntry)
 	li v1, 0x7
-	lw t1, 0x01D0(t1)
-	beq t1, v1, (@@MacBethDoQuickEnd)
+	lw v0, 0x01D0(t1)
+	beq v0, v1, (@@MacBethDoQuickEnd)
 	li v1, 0xB
-	lw t1, 0x01D0(t1)
-	beq t1, v1, (@@MacBethDoQuickEnd)
+	lw v0, 0x01D0(t1)
+	beq v0, v1, (@@MacBethDoQuickEnd)
 	nop
 	b (NextTableEntry)
 	nop
