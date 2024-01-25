@@ -303,7 +303,7 @@ TBL_FUNC_BossRushMode:
 	nop
 	
 @@OnAquas:
-	lui t0, 0x8024
+	lui t0, 0x8025
 	lhu v0, 0x9EEC(t0)
 	li v1, 0xF676
 	bne v0, v1, (@@Exit)
