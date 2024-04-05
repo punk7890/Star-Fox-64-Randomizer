@@ -92,6 +92,8 @@ TBL_FUNC_SpecialStage:
 	nop
 	li v0, 0xA
 	sh v0, (0x80186502)	;overwrite planet to go into from bolse level function
+	jal LoadPlayerInfoToGP
+	nop
 	j NextTableEntry
 	nop
 @@BolseScoreCheckBRM:
@@ -102,6 +104,8 @@ TBL_FUNC_SpecialStage:
 	nop
 	li v0, 0xA
 	sh v0, (0x80186502)	;overwrite planet to go into from bolse level function
+	jal LoadPlayerInfoToGP
+	nop
 	j NextTableEntry
 	nop
 	
@@ -110,6 +114,8 @@ TBL_FUNC_SpecialStage:
 	beq a0, r0, (@@Exit)	;bad luck
 	li v0, 0xA
 	sh v0, (0x80186502)	;overwrite planet to go into from bolse level function
+	jal LoadPlayerInfoToGP
+	nop
 	j NextTableEntry
 	nop
 	
@@ -164,6 +170,8 @@ TBL_FUNC_SpecialStage:
 	nop
 	li v0, 0xA
 	sh v0, (0x801858FE)	;overwrite planet to go into from A6 level function
+	jal LoadPlayerInfoToGP
+	nop
 	j NextTableEntry
 	nop
 @@A6ScoreCheckBRM:
@@ -174,6 +182,8 @@ TBL_FUNC_SpecialStage:
 	nop
 	li v0, 0xA
 	sh v0, (0x801858FE)	;overwrite planet to go into from A6 level function
+	jal LoadPlayerInfoToGP
+	nop
 	j NextTableEntry
 	nop
 @@A6ScoreCheckBRMMarathon:
@@ -184,6 +194,8 @@ TBL_FUNC_SpecialStage:
 	nop
 	li v0, 0xA
 	sh v0, (0x801858FE)	;overwrite planet to go into from A6 level function
+	jal LoadPlayerInfoToGP
+	nop
 	j NextTableEntry
 	nop
 @@A6ScoreCheckMarathon:
@@ -194,6 +206,8 @@ TBL_FUNC_SpecialStage:
 	nop
 	li v0, 0xA
 	sh v0, (0x801858FE)	;overwrite planet to go into from A6 level function
+	jal LoadPlayerInfoToGP
+	nop
 	j NextTableEntry
 	nop
 	
@@ -202,6 +216,8 @@ TBL_FUNC_SpecialStage:
 	beq a0, r0, (@@Exit)	;bad luck
 	li v0, 0xA
 	sh v0, (0x801858FE)	;overwrite planet to go into from A6 level function
+	jal LoadPlayerInfoToGP
+	nop
 	j NextTableEntry
 	nop
 
@@ -407,14 +423,19 @@ TBL_FUNC_SpecialStage:
 	li v0, 255
 	bne s7, v0, (@@CheckForRespawn)
 	;init all range mode starts
+	nop
+	jal LoadPlayerInfoToGame
+	nop
 	li v0, 0x0303
 	sh v0, (0x80157900)	;give player double health
 	la v1, LOC_PLAYER_LASER8
-	li at, 1
-	lb a0, 0x0000(v1)
-	sltiu v0, a0, 2
-	bnel v0, r0, (@@GiveBombs)
-	sb at, 0x0000(v1)	;give player twin lasers if not hypers
+	li at, 2
+	sb at, 0x0000(v1) ;give player hypers
+	; li at, 1
+	; lb a0, 0x0000(v1)
+	; sltiu v0, a0, 2
+	; bnel v0, r0, (@@GiveBombs)
+	; sb at, 0x0000(v1)	;give player twin lasers if not hypers
 @@GiveBombs:
 	la v1, LOC_PLAYER_BOMBS8
 	li at, 5
