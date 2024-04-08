@@ -252,7 +252,13 @@ SUB_CustomEndScreenHook:	;level end screen custom function. Runs twice when on-s
 	li a0, 0x01F8
 	b (@@PlanetSelectionsCheck)
 	nop
-@@Meteo:
+@@Meteo: ;if in warp set Fox end state to 0x1, otherwise boss ending is handled in TBL_FUNC_QuickScoreScreens
+	lw a0, LOC_SUB_SECTION_FLAG32
+	bne a0, r0, (@@MeteoWarp)
+	nop
+	b (@@PlanetSelectionsCheck)
+	nop
+@@MeteoWarp:
 	li a1, 0x1
 	jal SetFoxState
 	li a0, 0x01D0
@@ -307,6 +313,10 @@ TBL_FUNC_QuickScoreScreens:		;allows quick end score screens
 	li t0, 0x8016D6A0	;displays end score screen
 	lw a3, (LOC_INTRO_OUTRO_TIMER32)
 	jal GetLevelID
+	li v1, 0x0
+	beq v0, v1, (@@OnCorn)
+	li v1, 0x1
+	beq v0, v1, (@@OnMeteo)
 	li v1, 0x7
 	beq v0, v1, (@@OnSolar)
 	li v1, 0x3
@@ -340,6 +350,58 @@ TBL_FUNC_QuickScoreScreens:		;allows quick end score screens
 	li a1, 4
 	jal SetFoxState
 	li a0, 0x01D0
+	b (NextTableEntry)
+	sw v1, orga(gDidQuickScoreScreensFlag) (gp)
+	nop
+@@OnCorn:
+	lw v0, (LOC_LEVEL_SECTION_ID32)
+	li v1, 803 ;if level section ID is 803, assume second boss
+	bne v0, v1, (@@OnCornMechBoss)
+	li v1, 1 ;if level section ID is 1, assume second boss for Boss Rush Mode
+	bne v0, v1, (@@OnCornMechBoss)
+	li a0, 1
+	lw t1, (LOC_FOX_POINTER32)
+	lw v0, 0x01D0(t1)
+	li v1, 0xA	;if ending state A, display score screen
+	beql v0, v1, (@@OnCornWaterFallBossContinue)
+	sb a0, 0x0000(t0)
+@@OnCornWaterFallBossContinue:
+	li v1, 0xE001 ;wait 0xE001 frames then end level. 0xE000 is set in SUB_CustomEndScreenHook when QuickScoreScreens is on.
+	bne v1, a3, (NextTableEntry)
+	nop
+	sb r0, 0x0000(t0)
+	li a1, 5
+	jal SetFoxState
+	li a0, 0x01D0
+	lw v1, (LOC_FOX_POINTER32)
+	li a0, 0x01F8
+	addu v1, a0, v1
+	li a0, 0x2
+	sw a0, 0x0000(v1) ;store 2 frame count down for quickly ending the level
+	li v1, 1
+	b (NextTableEntry)
+	sw v1, orga(gDidQuickScoreScreensFlag) (gp)
+	nop
+@@OnCornMechBoss:
+	li v1, 1
+	sb v1, 0x0000(t0)
+	li a1, 4
+	jal SetFoxState
+	li a0, 0x01D0
+	b (NextTableEntry)
+	sw v1, orga(gDidQuickScoreScreensFlag) (gp)
+	nop
+@@OnMeteo:
+	lw a0, LOC_SUB_SECTION_FLAG32
+	bne a0, r0, (NextTableEntry) ;if on warp skip since this is handled in SUB_CustomEndScreenHook
+	li v1, 1 ;wait 1 frame at end then enable results screen
+	bne v1, a3, (NextTableEntry)
+	nop
+	sb v1, 0x0000(t0)
+	li a1, 2
+	jal SetFoxState
+	li a0, 0x01D0
+	li v1, 1
 	b (NextTableEntry)
 	sw v1, orga(gDidQuickScoreScreensFlag) (gp)
 	nop
