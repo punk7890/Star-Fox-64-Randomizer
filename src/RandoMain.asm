@@ -356,9 +356,20 @@ TBL_FUNC_QuickScoreScreens:		;allows quick end score screens
 @@OnCorn:
 	lw v0, (LOC_LEVEL_SECTION_ID32)
 	li v1, 803 ;if level section ID is 803, assume second boss
-	bne v0, v1, (@@OnCornMechBoss)
+	beq v0, v1, (@@OnCornWaterFallBoss)
 	li v1, 1 ;if level section ID is 1, assume second boss for Boss Rush Mode
-	bne v0, v1, (@@OnCornMechBoss)
+	beq v0, v1, (@@OnCornWaterFallBoss)
+	nop
+@@OnCornMechBoss:
+	li v1, 1
+	sb v1, 0x0000(t0)
+	li a1, 4
+	jal SetFoxState
+	li a0, 0x01D0
+	b (NextTableEntry)
+	sw v1, orga(gDidQuickScoreScreensFlag) (gp)
+	nop
+@@OnCornWaterFallBoss:
 	li a0, 1
 	lw t1, (LOC_FOX_POINTER32)
 	lw v0, 0x01D0(t1)
@@ -379,15 +390,6 @@ TBL_FUNC_QuickScoreScreens:		;allows quick end score screens
 	li a0, 0x2
 	sw a0, 0x0000(v1) ;store 2 frame count down for quickly ending the level
 	li v1, 1
-	b (NextTableEntry)
-	sw v1, orga(gDidQuickScoreScreensFlag) (gp)
-	nop
-@@OnCornMechBoss:
-	li v1, 1
-	sb v1, 0x0000(t0)
-	li a1, 4
-	jal SetFoxState
-	li a0, 0x01D0
 	b (NextTableEntry)
 	sw v1, orga(gDidQuickScoreScreensFlag) (gp)
 	nop

@@ -556,18 +556,20 @@ CheckIfExpert:		;returns 1 in v0 if so, else 0
 	
 SaveCheckPoint:		;creates a fake save position at foxes current pos when called. An actual checkpoint will erase this if collected before setting.
 
-	addiu sp, sp, -4
+	addiu sp, sp, -12
 	swc1 f0, 0(sp)
+	swc1 f2, 4(sp)
+	swc1 f4, 8(sp)
 	lw t0, (LOC_FOX_POINTER32)
 	beq t0, r0, (@@End)
 	lw a0, (LOC_LEVEL_SECTION_ID32)	;grab current section ID
 	sw a0, (LOC_CHECKPOINT_SECTION_ID32)	;save new section ID
 	;lwu a1, 0x0144(t0)	;grab foxes pos
 	lui at, 0x437A
-	mtc1 at, f5
-	lwc1 F4, 0x0144(t0)	;grab foxes pos
-	sub.s f0, f4, f5
-	swc1 f0, (LOC_CHECKPOINT_LEVEL_POS32)
+	mtc1 at, f0
+	lwc1 f2, 0x0144(t0)	;grab foxes pos
+	sub.s f4, f2, f0
+	swc1 f4, (LOC_CHECKPOINT_LEVEL_POS32)
 	;sw a1, (LOC_CHECKPOINT_LEVEL_POS32)	;save pos to checkpoint pos
 	lw a2, (LOC_PLAYER_HITS32)	;grab player level hits
 	sw a2, (LOC_CHECKPOINT_HITS32) ;save player level hits
@@ -588,8 +590,10 @@ SaveCheckPoint:		;creates a fake save position at foxes current pos when called.
 	sw a1, 0xFFFC(v1)
 @@End:
 	lwc1 f0, 0x0000(sp)
+	lwc1 f2, 0x0004(sp)
+	lwc1 f4, 0x0008(sp)
 	jr ra
-	addiu sp, sp, 4
+	addiu sp, sp, 12
 	nop
 	
 DoSpecialState:		;does certain states like pause, freeze, resume or restart the level. Pass one of the values in a0 to this function.

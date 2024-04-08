@@ -1851,9 +1851,9 @@ SUB_InGameText:		;function for displaying in-game text whenever. Can use at-t7 a
 	li a0, 0x0110
 	jal SetFoxState
 	lui a1, 0x42F0
-	li.u a0, SFX_1UP
-	jal PlaySFX
-	li.l a0, SFX_1UP
+	; li.u a0, SFX_1UP
+	; jal PlaySFX
+	; li.l a0, SFX_1UP
 	b (@@CheckMapScreenState)
 	nop
 	
