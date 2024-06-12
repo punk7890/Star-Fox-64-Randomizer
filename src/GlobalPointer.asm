@@ -263,6 +263,8 @@ gSpecialStageRegularScore:	;total score for regular game mode or random planets.
 
 gBossRushModeFlag:
 .d32 0
+gChooseBossModeFlag:
+.d32 0
 gPlayerLivesNotEqualFlagBRM:
 .d32 0
 gBRMAddToCompletedTimesFlag:
