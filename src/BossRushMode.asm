@@ -478,8 +478,12 @@ TBL_FUNC_BossRushMode:
 	;sw r0, orga(gBRMAddToCompletedTimesFlag) (gp)
 	lw a0, orga(gTimerScoreREGULAR) (gp)
 	sw a0, orga(gTimerScoreToDisplay) (gp)
+	lw v0, orga(gEnablePlanetSelections) (gp)
+	bne v0, r0, (@@SkipPlanetSelections) ;remove planet function from game code if choose planets isn't on
+	nop
 	jal KillLevelStoreFunction
 	nop
+@@SkipPlanetSelections:
 	lw v0, orga(gBRMAddToCompletedTimesFlag) (gp)
 	beq v0, r0, (@@CheckLives)
 	lw a0, orga(gBRMAddToCompletedTimes) (gp)
