@@ -454,11 +454,18 @@ TBL_FUNC_QuickScoreScreens:		;allows quick end score screens
 @@OnSXandSY:
 	lw t1, (LOC_FOX_POINTER32)
 	beq t1, r0, (NextTableEntry)
+	lw a0, LOC_SUB_SECTION_FLAG32
+	bne a0, r0, (@@OnSXWarp) ;if on warp, just enable score screen
 	li v1, 1
 	sb v1, 0x0000(t0)
 	li a1, 0x2
 	jal SetFoxState
 	li a0, 0x01D0
+	b (NextTableEntry)
+	sw v1, orga(gDidQuickScoreScreensFlag) (gp)
+	nop
+@@OnSXWarp:
+	sb v1, 0x0000(t0)
 	b (NextTableEntry)
 	sw v1, orga(gDidQuickScoreScreensFlag) (gp)
 	nop
