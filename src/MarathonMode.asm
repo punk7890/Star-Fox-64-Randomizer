@@ -44,7 +44,8 @@ TBL_FUNC_MarathonMode:
 	nop
 	
 @@TrainingModeAliveChecks:
-
+	lw a0, orga(gSpecialStagePlayerActive) (gp)
+	bne a0, r0, (@@Exit)	;skip if in special stage
 	li v1, 0xFF38
 	lhu at, (0x8020cac4)	;I think this checks if some object is loaded
 	bne v1, at, (@@Exit)	;exit if not active in training

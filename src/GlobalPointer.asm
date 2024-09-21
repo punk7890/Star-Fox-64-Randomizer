@@ -8,7 +8,7 @@
 .region 0x8000	;No idea how to properly use all 64kb of global pointer space with this compiler, so it's limited to 32kb.
 
 GLOBAL_POINTER:		;top of global pointer
-.asciiz "2024-06-14 14:58:51"
+.asciiz "2024-09-20 18:00:39"
 .align 4,0
 
 gDebugModeFlag:		;enables a set of test features
@@ -237,6 +237,8 @@ gEndScreenHookCreated:
 gSpecialStageFlag:	;1 on (score unlock method), 2 random
 .d32 2
 gSpecialStageRandomFlag:
+.d32 0
+gSpecialStagePlayerActive: ;used for skipping regluar training level if Marathon Mode is active
 .d32 0
 gSpecialStageSuperWolfFlag:
 .d32 0

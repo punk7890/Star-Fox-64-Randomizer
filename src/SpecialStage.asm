@@ -196,6 +196,8 @@ TBL_FUNC_SpecialStage:
 	sh v0, (0x801858FE)	;overwrite planet to go into from A6 level function
 	jal LoadPlayerInfoToGP
 	nop
+	li v0, 1
+	sw v0, orga(gSpecialStagePlayerActive) (gp)
 	j NextTableEntry
 	nop
 @@A6ScoreCheckMarathon:
@@ -208,6 +210,8 @@ TBL_FUNC_SpecialStage:
 	sh v0, (0x801858FE)	;overwrite planet to go into from A6 level function
 	jal LoadPlayerInfoToGP
 	nop
+	li v0, 1
+	sw v0, orga(gSpecialStagePlayerActive) (gp)
 	j NextTableEntry
 	nop
 	
@@ -218,6 +222,8 @@ TBL_FUNC_SpecialStage:
 	sh v0, (0x801858FE)	;overwrite planet to go into from A6 level function
 	jal LoadPlayerInfoToGP
 	nop
+	li v0, 1
+	sw v0, orga(gSpecialStagePlayerActive) (gp)
 	j NextTableEntry
 	nop
 
@@ -248,6 +254,7 @@ TBL_FUNC_SpecialStage:
 	sw r0, orga(gSpecialStageSuperWolfFlag) (gp)
 	sw r0, orga(gSpecialStageSuperWolfFlag2) (gp)
 	sw r0, orga(gSpecialStageSuperWolfFlag3) (gp)
+	sw r0, orga(gSpecialStagePlayerActive) (gp)
 	j NextTableEntry
 	sw r0, orga(gSpecialStageChoosePlanetsFlag) (gp)
 	nop
@@ -260,6 +267,7 @@ TBL_FUNC_SpecialStage:
 	jal DoSoftResetWithFlag
 	li.l a0, 0x00060007
 	sw r0, orga(gSpecialStageChoosePlanetsFlag) (gp)
+	sw r0, orga(gSpecialStagePlayerActive) (gp)
 	j NextTableEntry
 	sw r0, orga(gSpecialStageRandomFlag) (gp)
 	nop
@@ -272,6 +280,7 @@ TBL_FUNC_SpecialStage:
 	jal DoSoftResetWithFlag
 	li.l a0, 0x00130007
 	sw r0, orga(gSpecialStageChoosePlanetsFlag) (gp)
+	sw r0, orga(gSpecialStagePlayerActive) (gp)
 	j NextTableEntry
 	sw r0, orga(gSpecialStageRandomFlag) (gp)
 	nop
@@ -353,6 +362,7 @@ TBL_FUNC_SpecialStage:
 	jal LoadPlayerInfoToGP
 	nop
 	sw r0, orga(gSpecialStageRandomFlag) (gp)
+	sw r0, orga(gSpecialStagePlayerActive) (gp)
 	j NextTableEntry
 	sw r0, orga(gSpecialStageChoosePlanetsFlag) (gp)
 	nop
@@ -374,6 +384,7 @@ TBL_FUNC_SpecialStage:
 	jal LoadPlayerInfoToGP
 	nop
 	sw r0, orga(gSpecialStageRandomFlag) (gp)
+	sw r0, orga(gSpecialStagePlayerActive) (gp)
 	j NextTableEntry
 	sw r0, orga(gSpecialStageChoosePlanetsFlag) (gp)
 	nop
