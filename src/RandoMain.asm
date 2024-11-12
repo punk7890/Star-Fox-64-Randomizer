@@ -354,6 +354,9 @@ TBL_FUNC_QuickScoreScreens:		;allows quick end score screens
 	sw v1, orga(gDidQuickScoreScreensFlag) (gp)
 	nop
 @@OnCorn:
+	lh v0, (0x80164F82) ;grab boss ID. If 0x0124, on first boss.
+	li v1, 0x124
+	beq v0, v1, (@@OnCornMechBoss)
 	lw v0, (LOC_LEVEL_SECTION_ID32)
 	li v1, 803 ;if level section ID is 803, assume second boss
 	beq v0, v1, (@@OnCornWaterFallBoss)
